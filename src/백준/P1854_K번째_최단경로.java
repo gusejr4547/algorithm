@@ -39,7 +39,7 @@ public class P1854_K번째_최단경로 {
 
         for (int i = 1; i <= N; i++) {
             if (dist[i].size() == K) {
-                System.out.println(dist[i].poll());
+                System.out.println(dist[i].peek());
             } else {
                 System.out.println(-1);
             }
@@ -48,36 +48,26 @@ public class P1854_K번째_최단경로 {
 
     private static void dijkstra(int start) {
         PriorityQueue<Node> pq = new PriorityQueue<>((e1, e2) -> e1.cost - e2.cost > 0 ? 1 : -1);
-//        int[] visit = new int[N + 1];
-//        pq.offer(new Node(start, 0, new boolean[N + 1]));
         pq.offer(new Node(start, 0));
-
+        dist[start].offer(0L);
 
         while (!pq.isEmpty()) {
             Node curr = pq.poll();
             int idx = curr.idx;
-            // 방문 체크, dist pq에 K개가 차면 root 값 비교해서 작으면 교체, 크면 다음 진행
-            if (dist[idx].size() < K) {
-                dist[idx].offer(curr.cost);
-            } else {
-                if (dist[idx].peek() > curr.cost) {
-                    dist[idx].poll();
-                    dist[idx].offer(curr.cost);
-                } else {
-                    continue;
-                }
-            }
 
             for (Node next : adj[idx]) {
                 long cost = curr.cost + next.cost;
-                pq.offer(new Node(next.idx, cost));
-//                if (!curr.visit[next.idx]) {
-//                    boolean[] currVisitCopy = Arrays.copyOf(curr.visit, curr.visit.length);
-//                    currVisitCopy[next.idx] = true;
-//                    pq.offer(new Node(next.idx, cost, currVisitCopy));
+                // 방문 체크, dist pq에 K개가 차면 root 값 비교해서 작으면 교체, 크면 다음 진행
+                if (dist[next.idx].size() < K) {
+                    dist[next.idx].offer(cost);
 
-//                }
+                    pq.offer(new Node(next.idx, cost));
+                } else if (dist[next.idx].peek() > cost) {
+                    dist[next.idx].poll();
+                    dist[next.idx].offer(cost);
 
+                    pq.offer(new Node(next.idx, cost));
+                }
             }
         }
     }
@@ -85,7 +75,6 @@ public class P1854_K번째_최단경로 {
     static class Node {
         int idx;
         long cost;
-//        boolean[] visit;
 
         public Node() {
         }
@@ -94,12 +83,6 @@ public class P1854_K번째_최단경로 {
             this.idx = idx;
             this.cost = cost;
         }
-
-//        public Node(int idx, long cost, boolean[] visit) {
-//            this.idx = idx;
-//            this.cost = cost;
-//            this.visit = visit;
-//        }
 
         @Override
         public String toString() {
