@@ -2,13 +2,15 @@ package 백준;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class P17500_국경 {
 
     static int N;
     static char[][] map;
+
+    static boolean[][] validVisit;
+    static List<int[]> animalPos;
     static char[][] ans;
     static boolean[][] visit;
     static int[] dy = {0, 0, 2, -2};
@@ -25,6 +27,8 @@ public class P17500_국경 {
             map[i] = br.readLine().toCharArray();
         }
 
+        animalPos = new ArrayList<>();
+
         // 초기화
         ans = new char[2 * N + 3][4 * N + 3];
         for (int i = 0; i < 2 * N + 3; i++) {
@@ -36,7 +40,11 @@ public class P17500_국경 {
                 } else if (i % 2 == 1 && j % 4 == 1) {
                     ans[i][j] = '+';
                 } else if (i % 2 == 0 && j % 4 == 3) {
-                    ans[i][j] = map[i / 2 - 1][j / 4];
+                    char c = map[i / 2 - 1][j / 4];
+                    if (c != '.')
+                        animalPos.add(new int[]{i / 2 - 1, j / 4});
+
+                    ans[i][j] = c;
                 } else {
                     ans[i][j] = ' ';
                 }
@@ -53,16 +61,27 @@ public class P17500_국경 {
         // (1,1) -> (n*2+1, n*4+1)
 
         visit[1][1] = true;
-        dfs(1,1);
+        dfs(1, 1);
 
     }
 
 
     static void dfs(int y, int x) {
-        if (y == N * 2 + 1 && x == N * 4 + 1) {
-            if (valid()) {
+        if (flag) {
+            return;
+        }
 
+        if (y == N * 2 + 1 && x == N * 4 + 1) {
+            validVisit = new boolean[N][N];
+
+            for (int[] animal : animalPos) {
+                // valid 하지 않으면 다음 탐색
+                if (!valid(animal[0], animal[1], map[animal[0]][animal[1]])) {
+                    return;
+                }
             }
+            flag = true;
+
             for (char[] arr : ans) {
                 System.out.println(arr);
             }
@@ -89,6 +108,10 @@ public class P17500_국경 {
                 nmx += mx[d];
             }
             visit[ny][nx] = true;
+
+            if (flag) {
+                return;
+            }
             // 다음 이동
             dfs(ny, nx);
             // 이동 경로 삭제
@@ -103,7 +126,30 @@ public class P17500_국경 {
         }
     }
 
-    private static boolean valid() {
+    private static boolean valid(int y, int x, char animal) {
+        if (validVisit[y][x]) {
+            return true;
+        }
+
+        int ansY = y * 2 + 1;
+
+        int ansX = x * 4 + 3;
+
+        for (int d = 0; d < 4; d++) {
+            int nmy = y + my[d];
+            int nmx = x + mx[d];
+            // 벽이 있어서 이동 못하는지 확인
+            int ny = ansY + dy[d] / 2;
+            int nx = ansX + dx[d] / 2;
+            if (ny < 0 || nx < 0 || ny >= 2 * N + 3 || nx >= 4 * N + 3 || map[ny][nx] != ' ') {
+                continue;
+            }
+
+            if (!valid(nmy, nmx, animal)) {
+                return false;
+            }
+        }
+
         return true;
     }
 }
