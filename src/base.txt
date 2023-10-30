@@ -1,0 +1,17 @@
+----
+[include(틀:대문 기념일)]
+----
+[include(틀:이용안내)]
+----
+[include(틀:나무위키 프로젝트)]
+----
+{{{#!wiki style="margin-bottom:-10px"
+{{{#!wiki style="margin-bottom:-10px"
+[include(위키운영:접근 틀)]
+}}}
+[include(틀:나무위키)]}}}
+----
+[include(틀:운영알림)]
+----
+[include(틀:운영토론)][[분류:나무위키]]
+## 운영 토론이나 운영 알림은 해당 틀을 편집해 주시기 바랍니다.
