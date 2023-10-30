@@ -1,9 +1,8 @@
 ----
-[include(틀:대문 기념일)]
+이부분이 충돌이 나겠지?
 ----
-[include(틀:이용안내)]
+이부분은 충돌이 안나겠지?
 ----
-[include(틀:나무위키 프로젝트)]
 ----
 {{{#!wiki style="margin-bottom:-10px"
 {{{#!wiki style="margin-bottom:-10px"
