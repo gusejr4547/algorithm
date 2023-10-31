@@ -50,9 +50,6 @@ public class P17500_국경 {
                 }
             }
         }
-        for (char[] arr : ans) {
-            System.out.println(arr);
-        }
 
         visit = new boolean[2 * N + 3][4 * N + 3];
 
@@ -62,6 +59,15 @@ public class P17500_국경 {
 
         visit[1][1] = true;
         dfs(1, 1);
+        if(flag){
+            System.out.println("yes");
+            for (char[] arr : ans) {
+                System.out.println(arr);
+            }
+        }else{
+            System.out.println("no");
+        }
+
 
     }
 
@@ -74,18 +80,35 @@ public class P17500_국경 {
         if (y == N * 2 + 1 && x == N * 4 + 1) {
             validVisit = new boolean[N][N];
 
+
+//            for (char[] arr : ans) {
+//                System.out.println(arr);
+//            }
+//            System.out.println("--------------------------------------------");
+
             for (int[] animal : animalPos) {
                 // valid 하지 않으면 다음 탐색
-                if (!valid(animal[0], animal[1], map[animal[0]][animal[1]])) {
+                int animalY = animal[0];
+                int animalX = animal[1];
+                if (validVisit[animalY][animalX]) {
+                    continue;
+                }
+                validVisit[animalY][animalX] = true;
+//                for(int i=0; i<N; i++){
+//                    System.out.println(Arrays.toString(validVisit[i]));
+//                }
+//                System.out.println("탐색 : " + animalY + " " + animalX + " " + map[animalY][animalX]);
+                if (!valid(animalY, animalX, map[animalY][animalX])) {
                     return;
                 }
             }
             flag = true;
+//            for (char[] arr : ans) {
+//                System.out.println(arr);
+//            }
+//            System.out.println("--------------------------------------------");
 
-            for (char[] arr : ans) {
-                System.out.println(arr);
-            }
-            System.out.println("--------------------------------------------");
+
             return;
         }
 
@@ -109,11 +132,12 @@ public class P17500_국경 {
             }
             visit[ny][nx] = true;
 
+            // 다음 이동
+            dfs(ny, nx);
+            // true이면 종료
             if (flag) {
                 return;
             }
-            // 다음 이동
-            dfs(ny, nx);
             // 이동 경로 삭제
             nmy = ny - my[d];
             nmx = nx - mx[d];
@@ -126,13 +150,10 @@ public class P17500_국경 {
         }
     }
 
+
     private static boolean valid(int y, int x, char animal) {
-        if (validVisit[y][x]) {
-            return true;
-        }
 
-        int ansY = y * 2 + 1;
-
+        int ansY = y * 2 + 2;
         int ansX = x * 4 + 3;
 
         for (int d = 0; d < 4; d++) {
@@ -141,10 +162,20 @@ public class P17500_국경 {
             // 벽이 있어서 이동 못하는지 확인
             int ny = ansY + dy[d] / 2;
             int nx = ansX + dx[d] / 2;
-            if (ny < 0 || nx < 0 || ny >= 2 * N + 3 || nx >= 4 * N + 3 || map[ny][nx] != ' ') {
+            if (ny < 0 || nx < 0 || ny >= 2 * N + 3 || nx >= 4 * N + 3 || ans[ny][nx] != ' ') {
                 continue;
             }
-
+            if (nmy < 0 || nmx < 0 || nmy >= N || nmx >= N || validVisit[nmy][nmx]) {
+                continue;
+            }
+            validVisit[nmy][nmx] = true;
+            // 위치 이동한 장소에 동물 확인
+            if (map[nmy][nmx] != '.' && animal != map[nmy][nmx]) {
+//                System.out.println(map[nmy][nmx]);
+//                System.out.println(animal);
+                return false;
+            }
+            // 다음 탐색
             if (!valid(nmy, nmx, animal)) {
                 return false;
             }
