@@ -53,17 +53,20 @@ public class 사단_고음 {
         if (plusCount > maxIterate * 2) {
             return 0;
         }
+        if (multipleCount * 2 > plusCount) {
+            return 0;
+        }
 
-        if (curr == 3 && plusCount == 2) {
+        if (curr == 3 && plusCount == (multipleCount + 1) * 2) {
             return 1;
-        } else if(curr == 3) {
+        } else if (curr == 3) {
             return 0;
         }
 
 
         int sum = 0;
-        if (curr % 3 == 0 && plusCount >= 2) {
-            sum += dfs(maxIterate, curr / 3, multipleCount + 1, plusCount - 2);
+        if (curr % 3 == 0) {
+            sum += dfs(maxIterate, curr / 3, multipleCount + 1, plusCount);
         }
         sum += dfs(maxIterate, curr - 1, multipleCount, plusCount + 1);
 
