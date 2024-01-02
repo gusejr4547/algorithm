@@ -7,6 +7,7 @@ import java.util.*;
 public class P22868_산책_small {
     static int N, M;
     static List<Integer>[] adj;
+    static int[] realPath;
 
 
     public static void main(String[] args) throws Exception {
@@ -36,15 +37,20 @@ public class P22868_산책_small {
 
         int answer = 0;
         boolean[] visit = new boolean[N + 1];
+        realPath = new int[N + 1];
         Node result = bfs(S, E, visit);
         answer += result.cost;
         Arrays.fill(visit, false);
-        st = new StringTokenizer(result.path);
-        while (st.hasMoreTokens()) {
-            visit[Integer.parseInt(st.nextToken())] = true;
+
+        int path = realPath[E];
+        while (path > 0) {
+            visit[path] = true;
+            path = realPath[path];
         }
+
         visit[S] = false;
         visit[E] = false;
+        System.out.println(Arrays.toString(realPath));
 //        System.out.println(Arrays.toString(visit));
         result = bfs(E, S, visit);
         answer += result.cost;
@@ -54,7 +60,7 @@ public class P22868_산책_small {
 
     static Node bfs(int start, int end, boolean[] visit) {
         ArrayDeque<Node> pq = new ArrayDeque<>();
-        pq.offer(new Node(start, 0, start + ""));
+        pq.offer(new Node(start, 0));
         visit[start] = true;
 
         while (!pq.isEmpty()) {
@@ -68,8 +74,8 @@ public class P22868_산책_small {
 
             for (int next : adj[curr.num]) {
                 if (visit[next]) continue;
-
-                pq.offer(new Node(next, curr.cost + 1, curr.path + " " + next));
+                realPath[next] = curr.num;
+                pq.offer(new Node(next, curr.cost + 1));
                 visit[next] = true;
             }
         }
@@ -80,13 +86,6 @@ public class P22868_산책_small {
     static class Node {
         int num;
         int cost;
-        String path;
-
-        public Node(int num, int cost, String path) {
-            this.num = num;
-            this.cost = cost;
-            this.path = path;
-        }
 
         public Node(int num, int cost) {
             this.num = num;
