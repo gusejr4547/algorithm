@@ -59,20 +59,17 @@ public class P18809_Gaaaaaaaaaarden {
         if (useIdx[idx]) {
             combinationGreen(n, idx + 1);
         } else {
-            combinationGreen(n, idx + 1);
             useIdx[idx] = true;
             green[n] = idx;
             combinationGreen(n + 1, idx + 1);
             useIdx[idx] = false;
+            combinationGreen(n, idx + 1);
         }
 
     }
 
     public static void combinationRed(int n, int idx) {
         if (n == R) {
-            System.out.println(Arrays.toString(green));
-            System.out.println(Arrays.toString(red));
-            System.out.println("----");
             bfs();
             return;
         }
@@ -82,11 +79,11 @@ public class P18809_Gaaaaaaaaaarden {
         if (useIdx[idx]) {
             combinationRed(n, idx + 1);
         } else {
-            combinationRed(n, idx + 1);
             useIdx[idx] = true;
             red[n] = idx;
             combinationRed(n + 1, idx + 1);
             useIdx[idx] = false;
+            combinationRed(n, idx + 1);
         }
     }
 
@@ -121,7 +118,7 @@ public class P18809_Gaaaaaaaaaarden {
             int currTime = states[y][x].time;
             int currType = states[y][x].type;
 
-            if (currTime == FLOWER) continue;
+            if (currType == FLOWER) continue;
 
             for (int d = 0; d < 4; d++) {
                 int ny = y + dy[d];
@@ -146,7 +143,6 @@ public class P18809_Gaaaaaaaaaarden {
 
             }
         }
-        System.out.println(result);
         answer = Math.max(answer, result);
     }
 
