@@ -36,33 +36,29 @@ public class P1726_로봇 {
     // 방향 순서: 동, 서, 남, 북
     private static int bfs(Status start, Status end) {
         PriorityQueue<Status> pq = new PriorityQueue<>((e1, e2) -> e1.cost - e2.cost);
-        boolean[][] visit = new boolean[M + 1][N + 1];
+        boolean[][][] visit = new boolean[M + 1][N + 1][4];
         pq.offer(start);
-
 
         while (!pq.isEmpty()) {
             Status curr = pq.poll();
             int currDir = curr.direction;
+            int currY = curr.y;
+            int currX = curr.x;
+            int currCost = curr.cost;
 
-            if (curr.y == end.y && curr.x == end.x) {
-                int diffDir = 0;
-                if (currDir == end.direction) diffDir = 0;
-                else if (currDir >= 2) {
-                    if (end.direction < 2) diffDir = 1;
-                    else diffDir = 2;
-                } else {
-                    if (end.direction < 2) diffDir = 2;
-                    else diffDir = 1;
-                }
-                return curr.cost + diffDir;
+            if (currY == end.y && currX == end.x && currDir == end.direction) {
+                return curr.cost;
             }
 
-            if (visit[curr.y][curr.x]) continue;
-            visit[start.y][start.x] = true;
+            if (visit[currY][currX][currDir]) continue;
+            visit[currY][currX][currDir] = true;
 
-//            System.out.println(curr.y + ", " + curr.x + ", " + currDir + " cost : " + curr.cost);
+//            System.out.println(currY + ", " + currX + ", " + currDir + " cost : " + currCost);
 
+            // 방향
             for (int d = 0; d < 4; d++) {
+                if (visit[currY][currX][d]) continue;
+
                 int diffDir = 0;
                 if (currDir == d) diffDir = 0;
                 else if (currDir >= 2) {
@@ -72,15 +68,19 @@ public class P1726_로봇 {
                     if (d < 2) diffDir = 2;
                     else diffDir = 1;
                 }
-                for (int k = 1; k <= 3; k++) {
-                    int ny = curr.y + dy[d] * k;
-                    int nx = curr.x + dx[d] * k;
 
-                    if (ny <= 0 || nx <= 0 || ny > M || nx > N || map[ny][nx] == 1) break;
-                    if (visit[ny][nx]) continue;
+                pq.offer(new Status(currY, currX, d, currCost + diffDir));
+            }
 
-                    pq.offer(new Status(ny, nx, d, curr.cost + diffDir + 1));
-                }
+            // 이동
+            for (int k = 1; k <= 3; k++) {
+                int ny = currY + dy[currDir] * k;
+                int nx = currX + dx[currDir] * k;
+
+                if (ny <= 0 || nx <= 0 || ny > M || nx > N || map[ny][nx] == 1) break;
+                if (visit[ny][nx][currDir]) continue;
+
+                pq.offer(new Status(ny, nx, currDir, currCost + 1));
             }
         }
 
