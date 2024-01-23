@@ -13,69 +13,43 @@ public class 카운트_다운 {
     // 최소 다트
     // 먼저 고려 -> 싱글, 불
     public int[] solution(int target) {
-        int[] answer = new int[2];
-        State result = bfs(target);
-        answer[0] = result.throwCount;
-        answer[1] = result.singleAndBullCount;
-        return answer;
-    }
-
-    public State bfs(int start) {
         final int BULL = 50;
-        PriorityQueue<State> pq = new PriorityQueue<>();
-        boolean[] visit = new boolean[start + 1];
-        pq.offer(new State(start, 0, 0));
+        int[] answer = new int[2];
+        // dp[i][0] : 점수 i, 던진 횟수
+        // dp[i][1] : 싱글, 불 횟수
+        int[][] dp = new int[target + 1][2];
 
-        while (!pq.isEmpty()) {
-            State curr = pq.poll();
+        for (int i = 0; i <= target; i++) {
+            dp[i][0] = Integer.MAX_VALUE;
+        }
 
-            if (curr.score == 0) {
-                return curr;
+        dp[0][0] = 0;
+        for (int score = 1; score <= target; score++) {
+            if (score - BULL >= 0) {
+                if (dp[score][0] > dp[score - BULL][0] + 1) {
+                    dp[score][0] = dp[score - BULL][0] + 1;
+                    dp[score][1] = dp[score - BULL][1] + 1;
+                } else if (dp[score][0] == dp[score - BULL][0] + 1) {
+                    dp[score][1] = Math.max(dp[score][1], dp[score - BULL][1] + 1);
+                }
             }
 
-            if (visit[curr.score]) continue;
-            visit[curr.score] = true;
-
-            // 불
-            if (curr.score - BULL >= 0 && !visit[curr.score - BULL]) {
-                pq.offer(new State(curr.score - BULL,
-                        curr.throwCount + 1, curr.singleAndBullCount + 1));
-            }
-            // 일반
-            for (int target = 1; target <= 20; target++) {
+            for (int t = 1; t <= 20; t++) {
                 for (int multi = 1; multi <= 3; multi++) {
-                    if (curr.score - target * multi >= 0 && !visit[curr.score - target * multi]) {
-                        pq.offer(new State(curr.score - target * multi,
-                                curr.throwCount + 1,
-                                multi == 1 ? curr.singleAndBullCount + 1 : curr.singleAndBullCount));
+                    if (score - t * multi >= 0) {
+                        if (dp[score][0] > dp[score - t * multi][0] + 1) {
+                            dp[score][0] = dp[score - t * multi][0] + 1;
+                            dp[score][1] = multi == 1 ? dp[score - t * multi][1] + 1 : dp[score - t * multi][1];
+                        } else if (multi == 1 && dp[score][0] == dp[score - t * multi][0] + 1) {
+                            dp[score][1] = Math.max(dp[score][1], dp[score - t * multi][1] + 1);
+                        }
                     }
                 }
             }
         }
-        return new State(0, 0, 0);
-    }
 
-
-    public class State implements Comparable<State> {
-        int score;
-        int throwCount;
-        int singleAndBullCount;
-
-        public State(int score, int throwCount, int singleAndBullCount) {
-            this.score = score;
-            this.throwCount = throwCount;
-            this.singleAndBullCount = singleAndBullCount;
-        }
-
-        @Override
-        public int compareTo(State o) {
-            if (this.throwCount == o.throwCount) {
-                if (this.singleAndBullCount == o.singleAndBullCount) {
-                    return this.score - o.score;
-                }
-                return o.singleAndBullCount - this.singleAndBullCount;
-            }
-            return this.throwCount - o.throwCount;
-        }
+        answer[0] = dp[target][0];
+        answer[1] = dp[target][1];
+        return answer;
     }
 }
