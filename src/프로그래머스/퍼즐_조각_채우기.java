@@ -125,13 +125,14 @@ public class 퍼즐_조각_채우기 {
         List<Point> blockInfo = new ArrayList<>();
 
         queue.offer(new Point(y, x));
-        blockInfo.add(new Point(y - y, x - x));
+//        blockInfo.add(new Point(y - y, x - x));
 
         while (!queue.isEmpty()) {
             Point curr = queue.poll();
 
             if (visit[curr.y][curr.x]) continue;
             visit[curr.y][curr.x] = true;
+            blockInfo.add(new Point(curr.y - y, curr.x - x));
 
             for (int d = 0; d < 4; d++) {
                 int ny = curr.y + dy[d];
@@ -141,7 +142,7 @@ public class 퍼즐_조각_채우기 {
                     continue;
                 if (map[ny][nx] == 1) {
                     queue.offer(new Point(ny, nx));
-                    blockInfo.add(new Point(ny - y, nx - x));
+//                    blockInfo.add(new Point(ny - y, nx - x));
                 }
             }
         }
