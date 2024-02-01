@@ -17,9 +17,11 @@ public class 사라지는_발판 {
         row = board.length;
         col = board[0].length;
 
-        Result result = turnA(board, aloc, bloc);
+//        Result result = turnA(board, aloc, bloc);
+//
+//        return result.turn;
 
-        return result.turn;
+        return minimax(board, aloc, bloc);
     }
 
     public Result turnA(int[][] board, int[] aloc, int[] bloc) {
@@ -53,7 +55,7 @@ public class 사라지는_발판 {
             board[ay][ax] = 1;
         }
 
-        if(!canMove){
+        if (!canMove) {
             return new Result(false, 0);
         }
         return new Result(isWin, (isWin ? win : lose) + 1);
@@ -90,7 +92,7 @@ public class 사라지는_발판 {
             board[by][bx] = 1;
         }
 
-        if(!canMove){
+        if (!canMove) {
             return new Result(false, 0);
         }
         return new Result(isWin, (isWin ? win : lose) + 1);
@@ -104,6 +106,42 @@ public class 사라지는_발판 {
             this.win = win;
             this.turn = turn;
         }
+    }
+
+    public int minimax(int[][] board, int[] now, int[] next) {
+        int currY = now[0];
+        int currX = now[1];
+        if (board[currY][currX] == 0) return 0; // 발판 사라짐
+
+        int result = 0;
+        for (int d = 0; d < 4; d++) {
+            int ny = currY + dy[d];
+            int nx = currX + dx[d];
+            if (ny < 0 || nx < 0 || ny >= row || nx >= col || board[ny][nx] == 0) continue;
+
+            board[currY][currX] = 0;
+            int turn = minimax(board, next, new int[]{ny, nx}) + 1;
+            board[currY][currX] = 1;
+
+            // turn이 홀수면 내가 이김, turn이 짝수면 내가 짐
+            // 한번이라도 이기는 경우가 생기면 이겨야 하는 플레이어
+            // 전부 지면 지는 플레이어
+
+            // 지금까지 지다가 이긴 경우
+            if (turn % 2 == 1 && result % 2 == 0) {
+                result = turn;
+            }
+            // 이기고 이긴 경우
+            else if (turn % 2 == 1 && result % 2 == 1) {
+                result = Math.min(result, turn);
+            }
+            // 지다가 진 경우
+            else if (turn % 2 == 0 && result % 2 == 0) {
+                result = Math.max(result, turn);
+            }
+        }
+
+        return result;
     }
 
 }
