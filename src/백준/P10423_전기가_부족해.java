@@ -8,7 +8,6 @@ public class P10423_전기가_부족해 {
     static int N, M, K;
     static List<Edge> edgeList;
     static int[] parent;
-    static Set<Integer> electric;
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -18,14 +17,18 @@ public class P10423_전기가_부족해 {
         M = Integer.parseInt(st.nextToken());
         K = Integer.parseInt(st.nextToken());
 
-        electric = new HashSet<>();
+        parent = new int[N + 1];
+        for (int i = 0; i <= N; i++) {
+            parent[i] = i;
+        }
+
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < K; i++) {
-            electric.add(Integer.parseInt(st.nextToken()));
+            int idx = Integer.parseInt(st.nextToken());
+            parent[idx] = -1;
         }
 
         edgeList = new ArrayList<>();
-
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
             int u = Integer.parseInt(st.nextToken());
@@ -35,39 +38,39 @@ public class P10423_전기가_부족해 {
             edgeList.add(new Edge(u, v, w));
         }
 
-        parent = new int[N + 1];
-        for (int i = 0; i <= N; i++) {
-            parent[i] = i;
-        }
 
         Collections.sort(edgeList, Comparator.comparingInt(e -> e.cost));
+
         int result = 0;
         for (Edge edge : edgeList) {
             int parent1 = find(edge.node1);
             int parent2 = find(edge.node2);
-            if (parent1 != parent2
-                    && (!electric.contains(parent1) || !electric.contains(parent2))) {
+            if (parent1 != parent2) {
                 union(edge.node1, edge.node2);
                 result += edge.cost;
-            }
 
-            boolean isValid = true;
-            for (int i = 1; i <= N; i++) {
-                if (!electric.contains(parent[i])) {
-                    isValid = false;
+                if (isValid()) {
                     break;
                 }
-            }
-            if (isValid) {
-                break;
             }
         }
 
         System.out.println(result);
+    }
 
+    public static boolean isValid() {
+        for (int i = 1; i <= N; i++) {
+            if (parent[i] != -1) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static int find(int a) {
+        if (-1 == parent[a]) {
+            return -1;
+        }
         if (a == parent[a])
             return a;
         return parent[a] = find(parent[a]);
@@ -78,9 +81,9 @@ public class P10423_전기가_부족해 {
         b = find(b);
 
         if (a != b) {
-            if (electric.contains(a)) {
+            if (a == -1) {
                 parent[b] = a;
-            } else if (electric.contains(b)) {
+            } else if (b == -1) {
                 parent[a] = b;
             } else if (a < b) {
                 parent[b] = a;
