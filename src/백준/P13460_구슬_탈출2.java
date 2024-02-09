@@ -19,7 +19,7 @@ public class P13460_구슬_탈출2 {
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
 
-        Point red, blue, endPoint;
+        Point red = null, blue = null, endPoint = null;
         board = new char[N][];
         for (int i = 0; i < N; i++) {
             board[i] = br.readLine().toCharArray();
@@ -33,35 +33,90 @@ public class P13460_구슬_탈출2 {
             }
         }
 
-
+        System.out.println(bfs(red, blue, endPoint));
     }
 
-    static int bfs(Point red, Point blue) {
+    static int bfs(Point red, Point blue, Point end) {
         ArrayDeque<State> queue = new ArrayDeque<>();
         Set<Point[]> visit = new HashSet<>();
         queue.offer(new State(red, blue, 0));
+        visit.add(new Point[]{red, blue});
 
         while (!queue.isEmpty()) {
             State curr = queue.poll();
             Point currRed = curr.red;
             Point currBlue = curr.blue;
 
-            if (visit.contains(new Point[]{currRed, currBlue})) continue;
-            visit.add(new Point[]{red, blue});
-
+            if(curr.time > 10)
+                break;
 
             // 4방향 기울이기
             for (int d = 0; d < 4; d++) {
                 // red, blue
                 int rY = currRed.y;
                 int rX = currRed.x;
-                int bY = currBlue.y + dy[d];
-                int bX = currBlue.x + dx[d];
-                while (board[rY + dy[d]][rX + dx[d]] != '#') {
+                int bY = currBlue.y;
+                int bX = currBlue.x;
 
+                boolean redEnd = false;
+                boolean blueEnd = false;
+
+                while (board[rY + dy[d]][rX + dx[d]] != '#') {
+                    rY = rY + dy[d];
+                    rX = rX + dx[d];
+
+                    if (rY == end.y && rX == end.x) {
+                        redEnd = true;
+                        break;
+                    }
+                }
+
+                while (board[bY + dy[d]][bX + dx[d]] != '#') {
+                    bY = bY + dy[d];
+                    bX = bX + dx[d];
+
+                    if (bY == end.y && bX == end.x) {
+                        blueEnd = true;
+                        break;
+                    }
+                }
+
+                if (blueEnd) continue;
+                if (redEnd && !blueEnd) return curr.time + 1;
+
+                if (rY == bY && rX == bX) {
+                    if (d == 0) {
+                        if (currRed.x < currBlue.x)
+                            rX -= dx[d];
+                        else
+                            bX -= dx[d];
+                    } else if (d == 1) {
+                        if (currRed.x < currBlue.x)
+                            bX -= dx[d];
+                        else
+                            rX -= dx[d];
+                    } else if (d == 2) {
+                        if (currRed.y < currBlue.y)
+                            rY -= dy[d];
+                        else
+                            bY -= dy[d];
+                    } else if (d == 3) {
+                        if (currRed.y < currBlue.y)
+                            bY -= dy[d];
+                        else
+                            rY -= dy[d];
+                    }
+                }
+
+                Point nextRed = new Point(rY, rX);
+                Point nextBlue = new Point(bY, bX);
+                if (!visit.contains(new Point[]{nextRed, nextBlue})) {
+                    visit.add(new Point[]{nextRed, nextBlue});
+                    queue.offer(new State(nextRed, nextBlue, curr.time + 1));
                 }
             }
         }
+        return -1;
     }
 
     static class State {
@@ -79,6 +134,9 @@ public class P13460_구슬_탈출2 {
     static class Point {
         int y;
         int x;
+
+        public Point() {
+        }
 
         public Point(int y, int x) {
             this.y = y;
