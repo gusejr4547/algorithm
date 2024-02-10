@@ -3,8 +3,6 @@ package 백준;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayDeque;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 public class P13460_구슬_탈출2 {
@@ -38,16 +36,16 @@ public class P13460_구슬_탈출2 {
 
     static int bfs(Point red, Point blue, Point end) {
         ArrayDeque<State> queue = new ArrayDeque<>();
-        Set<Point[]> visit = new HashSet<>();
+        boolean[][][][] visit = new boolean[N][M][N][M];
         queue.offer(new State(red, blue, 0));
-        visit.add(new Point[]{red, blue});
+        visit[red.y][red.x][blue.y][blue.x] = true;
 
         while (!queue.isEmpty()) {
             State curr = queue.poll();
             Point currRed = curr.red;
             Point currBlue = curr.blue;
 
-            if(curr.time > 10)
+            if (curr.time >= 10)
                 break;
 
             // 4방향 기울이기
@@ -110,8 +108,8 @@ public class P13460_구슬_탈출2 {
 
                 Point nextRed = new Point(rY, rX);
                 Point nextBlue = new Point(bY, bX);
-                if (!visit.contains(new Point[]{nextRed, nextBlue})) {
-                    visit.add(new Point[]{nextRed, nextBlue});
+                if (!visit[rY][rX][bY][bX]) {
+                    visit[rY][rX][bY][bX] = true;
                     queue.offer(new State(nextRed, nextBlue, curr.time + 1));
                 }
             }
