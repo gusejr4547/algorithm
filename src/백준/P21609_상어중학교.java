@@ -2,10 +2,7 @@ package 백준;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class P21609_상어중학교 {
     static final int EMPTY = -2;
@@ -30,28 +27,19 @@ public class P21609_상어중학교 {
         }
 
         solution();
+        System.out.println(result);
     }
 
     public static void solution() {
         while (true) {
             visit = new int[N][N];
-            List<Group> groupList = findGroup();
+            PriorityQueue<Group> groupList = findGroup();
             if (groupList.isEmpty())
                 return;
 
-            int idx = 0;
-            int max = 0;
-            for (int i = 0; i < groupList.size(); i++) {
-                if (max < groupList.get(i).size) {
-                    max = groupList.get(i).size;
-                    idx = i;
-                }
-            }
-
-            result += max * max;
-            Group blockGroup = groupList.get(idx);
+            Group blockGroup = groupList.poll();
+            result += blockGroup.size * blockGroup.size;
             deleteGroup(blockGroup.y, blockGroup.x, map[blockGroup.y][blockGroup.x]);
-
             gravity();
             rotate();
             gravity();
@@ -85,16 +73,15 @@ public class P21609_상어중학교 {
         }
     }
 
-    public static List<Group> findGroup() {
-        List<Group> groupList = new ArrayList<>();
-        int count = 1;
+    public static PriorityQueue<Group> findGroup() {
+        PriorityQueue<Group> groupList = new PriorityQueue<>();
+
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 if (map[i][j] > 0 && visit[i][j] == 0) {
-                    int size = groupSize(i, j, map[i][j], count);
-                    if (size >= 2) {
-                        groupList.add(new Group(i, j, size));
-                        count++;
+                    Group group = makeGroup(i, j, map[i][j]);
+                    if (group.size >= 2) {
+                        groupList.offer(group);
                     }
                 }
             }
@@ -103,8 +90,9 @@ public class P21609_상어중학교 {
         return groupList;
     }
 
-    public static int groupSize(int y, int x, int color, int count) {
+    public static Group makeGroup(int y, int x, int color) {
         int size = 0;
+        int rainbowCnt = 0;
         ArrayDeque<int[]> queue = new ArrayDeque<>();
         queue.offer(new int[]{y, x});
         while (!queue.isEmpty()) {
@@ -115,6 +103,8 @@ public class P21609_상어중학교 {
             if (visit[currY][currX] == color) continue;
             visit[currY][currX] = color;
             size++;
+            if (map[currY][currX] == 0)
+                rainbowCnt++;
 
             for (int d = 0; d < 4; d++) {
                 int ny = currY + dy[d];
@@ -130,26 +120,74 @@ public class P21609_상어중학교 {
             }
         }
 
-        return size;
+        return new Group(y, x, size, rainbowCnt);
     }
 
     public static void gravity() {
-
+        for (int x = 0; x < N; x++) {
+            int cnt = 0;
+            for (int y = N - 1; y >= 0; y--) {
+                if (map[y][x] == EMPTY) {
+                    cnt++;
+                } else {
+                    if (map[y][x] != -1 && cnt > 0) {
+                        map[y + cnt][x] = map[y][x];
+                        map[y][x] = EMPTY;
+                        y = y + cnt;
+                        cnt = 0;
+                    } else {
+                        cnt = 0;
+                    }
+                }
+            }
+        }
     }
 
     public static void rotate() {
-
+        int[][] newMap = new int[N][N];
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                newMap[N - j - 1][i] = map[i][j];
+            }
+        }
+        map = newMap;
     }
 
-    public static class Group {
+    public static class Group implements Comparable<Group> {
         int y;
         int x;
         int size;
+        int rainbowCnt;
 
-        public Group(int y, int x, int size) {
+        public Group(int y, int x, int size, int rainbowCnt) {
             this.y = y;
             this.x = x;
             this.size = size;
+            this.rainbowCnt = rainbowCnt;
+        }
+
+        @Override
+        public String toString() {
+            return "Group{" +
+                    "y=" + y +
+                    ", x=" + x +
+                    ", size=" + size +
+                    ", rainbowCnt=" + rainbowCnt +
+                    '}';
+        }
+
+        @Override
+        public int compareTo(Group o) {
+            if (this.size == o.size) {
+                if (this.rainbowCnt == o.rainbowCnt) {
+                    if (this.y == o.y) {
+                        return o.x - this.x;
+                    }
+                    return o.y - this.y;
+                }
+                return o.rainbowCnt - this.rainbowCnt;
+            }
+            return o.size - this.size;
         }
     }
 }
