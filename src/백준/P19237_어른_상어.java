@@ -91,8 +91,8 @@ public class P19237_어른_상어 {
 
             for (int i = 0; i < 4; i++) {
                 int nextDir = priority[m][dir][i];
-                int ny = shark.y + dy[i];
-                int nx = shark.x + dx[i];
+                int ny = shark.y + dy[nextDir];
+                int nx = shark.x + dx[nextDir];
                 if (ny < 0 || nx < 0 || ny >= N || nx >= N) {
                     continue;
                 }
@@ -106,8 +106,8 @@ public class P19237_어른_상어 {
             if (!phase1) {
                 for (int i = 0; i < 4; i++) {
                     int nextDir = priority[m][dir][i];
-                    int ny = shark.y + dy[i];
-                    int nx = shark.x + dx[i];
+                    int ny = shark.y + dy[nextDir];
+                    int nx = shark.x + dx[nextDir];
                     if (ny < 0 || nx < 0 || ny >= N || nx >= N) {
                         continue;
                     }
@@ -118,9 +118,11 @@ public class P19237_어른_상어 {
                 }
             }
 
+//            System.out.println("y : " + shark.y + ", " + "x : " + shark.x + ", dir : " + shark.direction);
             int ny = shark.y + dy[dir];
             int nx = shark.x + dx[dir];
             shark.direction = dir;
+//            System.out.println("ny : " + ny + ", nx : " + nx + ", dir : " + dir);
 
             if (map[ny][nx] == 0) {
                 map[ny][nx] = m;
@@ -145,6 +147,7 @@ public class P19237_어른_상어 {
             for (int j = 0; j < N; j++) {
                 if (smells[i][j] != null && smells[i][j].time != 0) {
                     smells[i][j].time--;
+                    if (smells[i][j].time == 0) smells[i][j] = null;
                 }
             }
         }
