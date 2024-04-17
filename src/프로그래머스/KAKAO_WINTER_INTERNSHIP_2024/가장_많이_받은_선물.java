@@ -1,4 +1,4 @@
-package 프로그래머스;
+package 프로그래머스.KAKAO_WINTER_INTERNSHIP_2024;
 
 
 import java.util.HashMap;
