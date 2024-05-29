@@ -16,32 +16,36 @@ public class 징검다리_건너기 {
     // 최대 몇 명 이동가능?
     public int solution(int[] stones, int k) {
         int N = stones.length;
-        int[] dp = new int[N];
-
-        // 초기값
-        for (int i = 0; i < k; i++) {
-            dp[i] = stones[i];
-        }
-
-        for (int i = k; i < N; i++) {
-            int max = 0;
-            for (int prev = 1; prev <= k; prev++) {
-                max = Math.max(max, dp[i - prev]);
-            }
-
-            dp[i] = Math.min(stones[i], max);
-        }
-
-//        System.out.println(Arrays.toString(dp));
-
         int answer = 0;
-        for (int prev = 1; prev <= k; prev++) {
-            if (N - prev < 0) {
-                break;
+
+        int min = 0;
+        int max = 200_000_000;
+
+        while (min <= max) {
+            int mid = (min + max) / 2;
+            if (valid(mid, k, stones)) {
+                min = mid + 1;
+                answer = mid;
+            } else {
+                max = mid - 1;
             }
-            answer = Math.max(answer, dp[N - prev]);
         }
 
         return answer;
+    }
+
+    private boolean valid(int mid, int k, int[] stones) {
+        int count = 0;
+        for (int i = 0; i < stones.length; i++) {
+            if (stones[i] < mid) {
+                count++;
+                if (count >= k) {
+                    return false;
+                }
+            } else {
+                count = 0;
+            }
+        }
+        return true;
     }
 }
