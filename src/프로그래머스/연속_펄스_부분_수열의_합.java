@@ -29,6 +29,7 @@ public class 연속_펄스_부분_수열의_합 {
 
         long answer = Math.max(cacheA[0], cacheB[0]);
 
+        // cache[i] = 인덱스 i를 오른쪽 끝으로 하는 구간의 최대합
         for (int i = 1; i < sequence.length; i++) {
             // 이전까지의 최대가 음수이면 현재값을 더하면 더 작아지기 때문에 초기화
             cacheA[i] = Math.max(0, cacheA[i - 1]) + seqTypeA[i];
