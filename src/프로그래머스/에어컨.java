@@ -1,5 +1,6 @@
 package 프로그래머스;
 
+import java.util.Arrays;
 import java.util.PriorityQueue;
 
 public class 에어컨 {
@@ -19,57 +20,75 @@ public class 에어컨 {
     // 에어컨이 꺼져 있다면 전력을 소비하지 않으며, 에어컨을 켜고 끄는데 필요한 시간과 전력은 0이라고 가정합니다.
     // 차내에 승객이 탑승 중일 때, 실내온도를 t1 ~ t2도 사이로 유지하면서, 에어컨의 소비전력을 최소화
     public int solution(int temperature, int t1, int t2, int a, int b, int[] onboard) {
-        int answer = 0;
 
-        // 에너지 최소로 마지막 시간까지 먼저 도달하는 것이 결과
-        PriorityQueue<MyEnergy> pq = new PriorityQueue<>((e1, e2) -> e1.totalEnergy - e2.totalEnergy);
-        pq.offer(new MyEnergy(0, 0, temperature));
+        // 온도 범위 -10 ~ 40 이므로 전체적으로 +10
+        temperature += 10;
+        t1 += 10;
+        t2 += 10;
 
-        while (!pq.isEmpty()) {
-            MyEnergy cur = pq.poll();
+        // 설정할 수 있는 온도 범위
+        int maxTemperature = Math.max(t2, temperature);
+        int minTemperature = Math.min(t1, temperature);
 
-            // 끝내는 조건
-            if (cur.time == onboard.length - 1 &&
-                    (onboard[cur.time] == 0 || (onboard[cur.time] == 1 && t1 <= cur.temperature && cur.temperature <= t2))) {
-                answer = cur.totalEnergy;
-                break;
+        // 1000초 * a의 가장 큰값
+        int maxValue = 1000 * 100;
+
+        int[][] dp = new int[onboard.length][Math.max(temperature, t2) + 1]; // [a][b] a시간에 b온도를 맞추기 위한 최소비용
+
+        for (int i = 0; i < onboard.length; i++) {
+            Arrays.fill(dp[i], maxValue);
+        }
+
+        // 0초의 온도는 temperature
+        dp[0][temperature] = 0;
+
+        for (int time = 1; time < onboard.length; time++) {
+            int maxTemp = maxTemperature;
+            int minTemp = minTemperature;
+
+            if (onboard[time] == 1) {
+                minTemp = t1;
+                maxTemp = t2;
             }
 
-            // 승객 있는데 실내온도 못맞춘경우
-            if (onboard[cur.time] == 1 && (cur.temperature < t1 || t2 < cur.temperature)) {
-                continue;
-            }
+            for (int tp = minTemp; tp <= maxTemp; tp++) {
+                int minEnergy = maxValue;
+                if (tp > temperature) {
+                    if (tp - 1 >= 0) {
+                        minEnergy = Math.min(minEnergy, dp[time - 1][tp - 1] + a);
+                    }
+                    if (tp + 1 < dp[0].length) {
+                        minEnergy = Math.min(minEnergy, dp[time - 1][tp + 1]);
+                    }
+                    minEnergy = Math.min(minEnergy, dp[time - 1][tp] + b);
+                } else if (tp < temperature) {
+                    if (tp - 1 >= 0) {
+                        minEnergy = Math.min(minEnergy, dp[time - 1][tp - 1]);
+                    }
+                    if (tp + 1 < dp[0].length) {
+                        minEnergy = Math.min(minEnergy, dp[time - 1][tp + 1] + a);
+                    }
+                    minEnergy = Math.min(minEnergy, dp[time - 1][tp] + b);
+                } else if (tp == temperature) {
+                    if (tp + 1 < dp[0].length) {
+                        minEnergy = Math.min(minEnergy, dp[time - 1][tp + 1]);
+                    }
+                    if (tp - 1 >= 0) {
+                        minEnergy = Math.min(minEnergy, dp[time - 1][tp - 1]);
+                    }
+                    minEnergy = Math.min(minEnergy, dp[time - 1][tp]);
+                }
 
-            // 에어컨 켜기
-            // 온도 변화
-            pq.offer(new MyEnergy(cur.time + 1, cur.totalEnergy + a, cur.temperature - 1));
-            pq.offer(new MyEnergy(cur.time + 1, cur.totalEnergy + a, cur.temperature + 1));
-            // 온도 유지 -> 에어컨 킴
-            if (cur.temperature < temperature) {
-                pq.offer(new MyEnergy(cur.time + 1, cur.totalEnergy + b, cur.temperature));
+                dp[time][tp] = minEnergy;
             }
-            // 에어컨 끄기
-            if (cur.temperature < temperature) {
-                pq.offer(new MyEnergy(cur.time + 1, cur.totalEnergy, cur.temperature + 1));
-            } else if (cur.temperature == temperature) {
-                pq.offer(new MyEnergy(cur.time + 1, cur.totalEnergy, cur.temperature));
-            } else {
-                pq.offer(new MyEnergy(cur.time + 1, cur.totalEnergy, cur.temperature - 1));
-            }
+//            System.out.println(Arrays.toString(dp[time]));
+        }
+        int answer = maxValue;
+
+        for (int i = minTemperature; i <= maxTemperature; i++) {
+            answer = Math.min(dp[onboard.length - 1][i], answer);
         }
 
         return answer;
-    }
-
-    public class MyEnergy {
-        int time;
-        int totalEnergy;
-        int temperature;
-
-        public MyEnergy(int time, int totalEnergy, int temperature) {
-            this.time = time;
-            this.totalEnergy = totalEnergy;
-            this.temperature = temperature;
-        }
     }
 }
