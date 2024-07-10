@@ -12,8 +12,7 @@ public class 주차_요금_계산 {
     }
 
     public int[] solution(int[] fees, String[] records) {
-        HashMap<String, Integer> totalParkingTime = new HashMap<>();
-        HashMap<String, Integer> parking = new HashMap<>();
+        Map<String, Integer> totalParkingTime = new TreeMap<>();
 
         for (String record : records) {
             StringTokenizer st = new StringTokenizer(record);
@@ -22,34 +21,29 @@ public class 주차_요금_계산 {
             String state = st.nextToken();
 
             if ("IN".equals(state)) {
-                parking.put(carNum, time);
+                totalParkingTime.put(carNum, totalParkingTime.getOrDefault(carNum, 0) + time * -1);
             } else {
-                int parkingTime = parking.get(carNum);
-                parking.remove(carNum);
-                totalParkingTime.put(carNum, totalParkingTime.getOrDefault(carNum, 0) + time - parkingTime);
+                totalParkingTime.put(carNum, totalParkingTime.getOrDefault(carNum, 0) + time);
             }
         }
 
         // 남아있는 차
         int endTime = hourToMinute("23:59");
-        for (String carNum : parking.keySet()) {
-            int parkingTime = parking.get(carNum);
-            totalParkingTime.put(carNum, totalParkingTime.getOrDefault(carNum, 0) + endTime - parkingTime);
-        }
+        int[] answer = new int[totalParkingTime.size()];
 
-        List<String> carNumArr = new ArrayList<>(totalParkingTime.keySet());
-        Collections.sort(carNumArr);
-
-        int[] answer = new int[carNumArr.size()];
-        for (int i = 0; i < carNumArr.size(); i++) {
-            String carNum = carNumArr.get(i);
-            int totalTime = totalParkingTime.get(carNum);
+        int idx = 0;
+        for (int totalTime : totalParkingTime.values()) {
+            if (totalTime < 1) {
+                totalTime += endTime;
+            }
 
             if (totalTime <= fees[0]) {
-                answer[i] = fees[1];
+                answer[idx] = fees[1];
             } else {
-                answer[i] = fees[1] + (int) Math.ceil((totalTime - fees[0]) / (double) fees[2]) * fees[3];
+                answer[idx] = fees[1] + (int) Math.ceil((totalTime - fees[0]) / (double) fees[2]) * fees[3];
             }
+
+            idx++;
         }
 
         return answer;
