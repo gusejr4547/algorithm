@@ -2,9 +2,9 @@ package 프로그래머스;
 
 import java.util.PriorityQueue;
 
-public class 미로_탈출 {
+public class 미로_탈출LV2 {
     public static void main(String[] args) {
-        미로_탈출 Main = new 미로_탈출();
+        미로_탈출LV2 Main = new 미로_탈출LV2();
         String[] maps = {"SOOOL", "XXXXO", "OOOOO", "OXXXX", "OOOOE"};
         System.out.println(Main.solution(maps));
     }
