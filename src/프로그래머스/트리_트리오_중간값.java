@@ -46,6 +46,12 @@ public class 트리_트리오_중간값 {
         visit = new boolean[n + 1];
         dfs(maxNode, 0);
 
+        // 위의 방법 말고
+        // maxNode에서 다익스트라를 해서 가장 먼 노드가 2개 이상인 경우 maxLen이 정답
+        // 가장 먼 노드가 1개인경우 maxLen-1이 정답
+
+
+
         int start = temp;
         int end = maxNode;
         // start 제외하고 end에서 시작하는 가장 먼 노드를 찾는다.
