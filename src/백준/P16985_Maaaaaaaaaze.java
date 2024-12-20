@@ -98,6 +98,11 @@ public class P16985_Maaaaaaaaaze {
         while (!queue.isEmpty()) {
             Node cur = queue.poll();
 
+            // 정답보다 거리 길면 구할필요없음
+            if (cur.len >= answer) {
+                break;
+            }
+
             if (cur.z == 4 && cur.y == 4 && cur.x == 4) {
                 // 종료
                 answer = Math.min(answer, cur.len);
