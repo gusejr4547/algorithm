@@ -49,6 +49,8 @@ public class P4902_삼각형의_값 {
                 for (int j = 2; j <= 2 * i - 1; j += 2) {
                     // (i,j)기준으로 역삼각형 >> j가 짝수여야함.
                     int sum = 0;
+                    // j/2 가 (i,j) 기준으로 올라갈 수 있는 줄 최대 개수
+                    // k < 2*(i-k) 를 만족해야함
                     for (int k = 0; k < Math.min(j / 2, i - j / 2); k++) {
                         sum += preSum[i - k][j] - preSum[i - k][j - 2 * k - 1];
                         result = Math.max(result, sum);
