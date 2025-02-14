@@ -1,4 +1,4 @@
-package 프로그래머스;
+package 프로그래머스.코드챌린지;
 
 import java.util.ArrayDeque;
 
