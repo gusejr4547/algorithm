@@ -5,6 +5,34 @@ import java.io.InputStreamReader;
 import java.util.ArrayDeque;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
+/*
+7 3 1
+4 0 0 0 0 0 0
+0 1 1 1 1 1 0
+0 1 3 3 3 1 0
+0 0 3 3 3 1 0
+0 1 3 3 3 1 0
+0 1 1 1 1 1 0
+0 0 0 0 0 0 0
+1 0 0
+1 1 1
+1 1 1
+1 1 1
+0 0 1
+1 0 1
+0 0 0
+1 1 1
+1 1 1
+0 1 1
+0 0 0
+1 1 1
+1 1 1
+2 1 0
+0 1 0
+1 0 3 3
+
+36
+*/
 
 // 나는 상하좌우 한칸씩 이동가능
 // 시간 이상 현상 => r,c 에서 v턴마다 d방향으로 한칸씩 확산
@@ -197,7 +225,7 @@ public class 미지의_공간_탈출 {
             if (cur.loc == 4) {
                 next.loc = d;
                 next.y = 0;
-                next.x = cur.y;
+                next.x = M - 1 - cur.y;
             } else if (cur.loc == 0) {
                 next.loc = 3;
                 next.y = cur.y;
@@ -269,7 +297,7 @@ public class 미지의_공간_탈출 {
             if (cur.loc == 4) {
                 next.loc = d;
                 next.y = 0;
-                next.x = cur.x;
+                next.x = M - 1 - cur.x;
             } else if (cur.loc == 0) {
                 next.loc = 4;
                 next.y = M - 1 - cur.x;
