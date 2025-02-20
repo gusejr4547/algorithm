@@ -1,4 +1,4 @@
-package 프로그래머스.코드챌린지;
+package 프로그래머스.코드챌린지_예선_2025;
 
 public class 택배_상자_꺼내기 {
     public static void main(String[] args) {

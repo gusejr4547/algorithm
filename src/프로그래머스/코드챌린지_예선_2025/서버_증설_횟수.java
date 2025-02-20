@@ -1,4 +1,4 @@
-package 프로그래머스.코드챌린지;
+package 프로그래머스.코드챌린지_예선_2025;
 
 import java.util.ArrayDeque;
 
