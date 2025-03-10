@@ -5,7 +5,8 @@ import java.util.*;
 public class 가장_큰_삼각형_덩어리 {
     public static void main(String[] args) {
         가장_큰_삼각형_덩어리 Main = new 가장_큰_삼각형_덩어리();
-        int[][] grid = {{-1, -1, -1}, {1, 1, -1}, {1, 1, 1}};
+//        int[][] grid = {{-1, -1, -1}, {1, 1, -1}, {1, 1, 1}};
+        int[][] grid = {{1, -1, 1, -1}, {1, 1, -1, -1}, {-1, -1, 1, 1}, {-1, -1, 1, -1}};
         System.out.println(Main.solution(grid));
     }
 
@@ -23,131 +24,190 @@ public class 가장_큰_삼각형_덩어리 {
     dir = 방향 1의 왼쪽 0, 오른쪽 1, 방향 -1의 왼쪽 2, 오른쪽 3
      */
 
-    int[][] dy = {{-1, 0}, {1, 0}, {1, 0}, {-1, 0}};
-    int[][] dx = {{0, -1}, {0, 1}, {0, -1}, {0, 1}};
+    int N, M;
+    int[][][] map;
+    int[][] visit;
+    // 우, 좌, 하, 상
+    int[] dy = {0, 0, 1, -1};
+    int[] dx = {1, -1, 0, 0};
 
     public int solution(int[][] grid) {
-        // 초기화
-        Map<TriangleBlock, List<TriangleBlock>> adj = new HashMap<>();
-//        Set<TriangleBlock> visit = new HashSet<>();
-        int N = grid.length;
-        int M = grid[0].length;
-        boolean[][][] visit = new boolean[N][M][4];
-        init(grid, N, M, adj);
+        N = grid.length;
+        M = grid[0].length;
+        map = new int[N][M][2];
+        visit = new int[N][M];
 
-        // 블럭 하나씩 선정해서 bfs를 통해 최대 넓이(길이)를 구한다
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (grid[i][j] == 1) {
+                    // /
+                    map[i][j][0] = 1;
+                    map[i][j][1] = 2;
+                } else {
+                    // \
+                    map[i][j][0] = 3;
+                    map[i][j][1] = 4;
+                }
+            }
+        }
+
+        int searchCnt = 1;
         int answer = 0;
-        for (TriangleBlock triangleBlock : adj.keySet()) {
-            if (visit[triangleBlock.y][triangleBlock.x][triangleBlock.dir]) continue;
-            int result = bfs(triangleBlock, visit, adj, N, M);
-            answer = Math.max(answer, result);
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                for (int k = 0; k < 2; k++) {
+                    if (visit[i][j] == 0) {
+                        int result = getSize(i, j, k, searchCnt, grid);
+                        answer = Math.max(answer, result);
+
+                        searchCnt++;
+                    }
+                }
+            }
         }
 
         return answer;
     }
 
-    private int bfs(TriangleBlock startBlock, boolean[][][] visit, Map<TriangleBlock, List<TriangleBlock>> adj, int N, int M) {
+    private int getSize(int startY, int startX, int startDir, int searchCnt, int[][] grid) {
         ArrayDeque<TriangleBlock> queue = new ArrayDeque<>();
-        queue.offer(startBlock);
-        boolean[][] gridVisit = new boolean[N][M];
-        int sum = 0;
+        queue.offer(new TriangleBlock(startY, startX, startDir));
+        visit[startY][startX] = searchCnt;
 
+        int sum = 0;
         while (!queue.isEmpty()) {
             TriangleBlock cur = queue.poll();
 
-            // 이미 방문한 정사각형칸에 도달하면 더이상 탐색 불가능 or 전체 삼각형 방문 횟수가 2를 넘은경우
-            if (gridVisit[cur.y][cur.x]) {
-                continue;
-            } else {
-                gridVisit[cur.y][cur.x] = true;
-                visit[cur.y][cur.x][cur.dir] = true;
-            }
+            sum++;
 
-            sum += 1;
+            int trianglePos = map[cur.y][cur.x][cur.dir];
+            List<int[]> nextArr = getNext(cur, trianglePos, grid);
 
-            List<TriangleBlock> nextAdj = adj.get(cur);
-            for (int nextIdx = 0; nextIdx < nextAdj.size(); nextIdx++) {
-                TriangleBlock next = nextAdj.get(nextIdx);
-                if (gridVisit[next.y][next.x]) continue;
-                queue.offer(next);
+            for (int[] next : nextArr) {
+                int nextY = next[0];
+                int nextX = next[1];
+                int nextPos = next[2]; // 1, 2, 3, 4
+                int nextDir = nextPos % 2 == 1 ? 0 : 1;
+
+                if (!isValid(nextY, nextX)) continue;
+
+                if (visit[nextY][nextX] == searchCnt) continue;
+
+                visit[nextY][nextX] = searchCnt;
+                queue.offer(new TriangleBlock(nextY, nextX, nextDir));
             }
         }
 
         return sum;
     }
 
-    private void init(int[][] grid, int N, int M, Map<TriangleBlock, List<TriangleBlock>> adj) {
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                if (grid[i][j] == 1) {
-                    TriangleBlock t1 = new TriangleBlock(i, j, 0);
-                    List<TriangleBlock> l1 = new ArrayList<>();
-                    for (int k = 0; k < 2; k++) {
-                        int ny = i + dy[0][k];
-                        int nx = j + dx[0][k];
-                        if (ny < 0 || nx < 0 || ny >= N || nx >= M)
-                            continue;
-                        // 상
-                        if (k == 0)
-                            l1.add(new TriangleBlock(ny, nx, grid[ny][nx] == 1 ? 1 : 2));
-                        // 좌
-                        if (k == 1)
-                            l1.add(new TriangleBlock(ny, nx, grid[ny][nx] == 1 ? 1 : 3));
-                    }
+    private List<int[]> getNext(TriangleBlock triangleBlock, int trianglePos, int[][] grid) {
+        int y = triangleBlock.y;
+        int x = triangleBlock.x;
+        int dir = triangleBlock.dir;
+        List<int[]> nextDir = new ArrayList<>(); // 최대 2가지 방향으로 갈 수 있음. (y,x,Pos)
 
-                    TriangleBlock t2 = new TriangleBlock(i, j, 1);
-                    List<TriangleBlock> l2 = new ArrayList<>();
-                    for (int k = 0; k < 2; k++) {
-                        int ny = i + dy[1][k];
-                        int nx = j + dx[1][k];
-                        if (ny < 0 || nx < 0 || ny >= N || nx >= M)
-                            continue;
-                        // 하
-                        if (k == 0)
-                            l2.add(new TriangleBlock(ny, nx, grid[ny][nx] == 1 ? 0 : 3));
-                        // 우
-                        if (k == 1)
-                            l2.add(new TriangleBlock(ny, nx, grid[ny][nx] == 1 ? 0 : 2));
-                    }
+        if (trianglePos == 1) {
+            // 좌, 상
+            int nextY = y + dy[1];
+            int nextX = x + dx[1];
+            if (isValid(nextY, nextX)) {
+                int[] next = new int[3];
+                next[0] = nextY;
+                next[1] = nextX;
+                int nextPos = grid[nextY][nextX] == 1 ? 2 : 4;
+                next[2] = nextPos;
+                nextDir.add(next);
+            }
 
-                    adj.put(t1, l1);
-                    adj.put(t2, l2);
-                } else {
-                    TriangleBlock t1 = new TriangleBlock(i, j, 2);
-                    List<TriangleBlock> l1 = new ArrayList<>();
-                    for (int k = 0; k < 2; k++) {
-                        int ny = i + dy[2][k];
-                        int nx = j + dx[2][k];
-                        if (ny < 0 || nx < 0 || ny >= N || nx >= M)
-                            continue;
-                        // 하
-                        if (k == 0)
-                            l1.add(new TriangleBlock(ny, nx, grid[ny][nx] == 1 ? 0 : 3));
-                        // 좌
-                        if (k == 1)
-                            l1.add(new TriangleBlock(ny, nx, grid[ny][nx] == 1 ? 1 : 3));
-                    }
+            nextY = y + dy[3];
+            nextX = x + dx[3];
+            if (isValid(nextY, nextX)) {
+                int[] next = new int[3];
+                next[0] = nextY;
+                next[1] = nextX;
+                int nextPos = grid[nextY][nextX] == 1 ? 2 : 3;
+                next[2] = nextPos;
+                nextDir.add(next);
+            }
 
-                    TriangleBlock t2 = new TriangleBlock(i, j, 3);
-                    List<TriangleBlock> l2 = new ArrayList<>();
-                    for (int k = 0; k < 2; k++) {
-                        int ny = i + dy[3][k];
-                        int nx = j + dx[3][k];
-                        if (ny < 0 || nx < 0 || ny >= N || nx >= M)
-                            continue;
-                        // 상
-                        if (k == 0)
-                            l2.add(new TriangleBlock(ny, nx, grid[ny][nx] == 1 ? 1 : 2));
-                        // 우
-                        if (k == 1)
-                            l2.add(new TriangleBlock(ny, nx, grid[ny][nx] == 1 ? 0 : 2));
-                    }
+        } else if (trianglePos == 2) {
+            // 우, 하
+            int nextY = y + dy[0];
+            int nextX = x + dx[0];
+            if (isValid(nextY, nextX)) {
+                int[] next = new int[3];
+                next[0] = nextY;
+                next[1] = nextX;
+                int nextPos = grid[nextY][nextX] == 1 ? 1 : 3;
+                next[2] = nextPos;
+                nextDir.add(next);
+            }
 
-                    adj.put(t1, l1);
-                    adj.put(t2, l2);
-                }
+            nextY = y + dy[2];
+            nextX = x + dx[2];
+            if (isValid(nextY, nextX)) {
+                int[] next = new int[3];
+                next[0] = nextY;
+                next[1] = nextX;
+                int nextPos = grid[nextY][nextX] == 1 ? 1 : 4;
+                next[2] = nextPos;
+                nextDir.add(next);
+            }
+        } else if (trianglePos == 3) {
+            // 좌, 하
+            int nextY = y + dy[1];
+            int nextX = x + dx[1];
+            if (isValid(nextY, nextX)) {
+                int[] next = new int[3];
+                next[0] = nextY;
+                next[1] = nextX;
+                int nextPos = grid[nextY][nextX] == 1 ? 2 : 4;
+                next[2] = nextPos;
+                nextDir.add(next);
+            }
+
+            nextY = y + dy[2];
+            nextX = x + dx[2];
+            if (isValid(nextY, nextX)) {
+                int[] next = new int[3];
+                next[0] = nextY;
+                next[1] = nextX;
+                int nextPos = grid[nextY][nextX] == 1 ? 1 : 4;
+                next[2] = nextPos;
+                nextDir.add(next);
+            }
+        } else {
+            // 우, 상
+            int nextY = y + dy[0];
+            int nextX = x + dx[0];
+            if (isValid(nextY, nextX)) {
+                int[] next = new int[3];
+                next[0] = nextY;
+                next[1] = nextX;
+                int nextPos = grid[nextY][nextX] == 1 ? 1 : 3;
+                next[2] = nextPos;
+                nextDir.add(next);
+            }
+
+            nextY = y + dy[3];
+            nextX = x + dx[3];
+            if (isValid(nextY, nextX)) {
+                int[] next = new int[3];
+                next[0] = nextY;
+                next[1] = nextX;
+                int nextPos = grid[nextY][nextX] == 1 ? 2 : 3;
+                next[2] = nextPos;
+                nextDir.add(next);
             }
         }
+
+        return nextDir;
+    }
+
+    private boolean isValid(int y, int x) {
+        return y >= 0 && x >= 0 && y < N && x < M;
     }
 
     private class TriangleBlock {
@@ -157,19 +217,6 @@ public class 가장_큰_삼각형_덩어리 {
             this.y = y;
             this.x = x;
             this.dir = dir;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            TriangleBlock that = (TriangleBlock) o;
-            return y == that.y && x == that.x && dir == that.dir;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(y, x, dir);
         }
     }
 }
