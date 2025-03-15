@@ -1,4 +1,4 @@
-package 코드트리;
+package 코드트리.기출문제;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
