@@ -24,10 +24,10 @@ public class P15824_너_봄에는_캡사이신이_맛있단다 {
         // 최댓값으로 쓰이는 경우 전부 +
         // 최솟값으로 쓰이는 경우 전부 -
         for (int i = 0; i < N; i++) {
-            long max = menu[i] * powerMod(2, i, MOD);
-            long min = menu[i] * powerMod(2, N - 1 - i, MOD);
+            answer += (menu[i] * powerMod(2, i, MOD));
+            answer -= (menu[i] * powerMod(2, N - 1 - i, MOD));
 
-            answer += max - min % MOD;
+            answer %= MOD;
         }
 
         System.out.println(answer);
@@ -37,11 +37,11 @@ public class P15824_너_봄에는_캡사이신이_맛있단다 {
         if (exp == 0) {
             return 1;
         }
-        long next = powerMod(base, exp / 2, mod);
+        long half = powerMod(base, exp / 2, mod);
         if (exp % 2 == 1) {
-            return next * next * base % mod;
+            return half * half * base % mod;
         } else {
-            return next * next % mod;
+            return half * half % mod;
         }
     }
 }
