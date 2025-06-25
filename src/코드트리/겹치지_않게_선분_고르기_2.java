@@ -12,26 +12,21 @@ public class 겹치지_않게_선분_고르기_2 {
             segments[i][1] = sc.nextInt();
         }
         // Please write your code here.
-        Arrays.sort(segments, (o1, o2) -> o1[1] - o2[1]);
+        Arrays.sort(segments, (o1, o2)->o1[1] - o2[1]);
 
         int[] dp = new int[n];
+        dp[0] = 1;
+        int max = segments[0][1];
 
-        for (int i = 0; i < n; i++) {
-            dp[i] = 1;
-            for (int j = 0; j < i; j++) {
-                if (segments[j][1] < segments[i][0]) {
-                    dp[i] = Math.max(dp[i], dp[j] + 1);
-                } else {
-                    break;
-                }
+        for(int i = 1; i < n; i++){
+            if(segments[i][0] <= max){
+                dp[i] = dp[i-1];
+            }else{
+                dp[i] = dp[i-1] + 1;
+                max = segments[i][1];
             }
         }
 
-        int answer = 0;
-        for (int i = 0; i < n; i++) {
-            answer = Math.max(answer, dp[i]);
-        }
-
-        System.out.println(answer);
+        System.out.println(dp[n-1]);
     }
 }
