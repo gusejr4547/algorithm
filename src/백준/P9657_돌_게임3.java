@@ -8,7 +8,7 @@ public class P9657_돌_게임3 {
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int N = Integer.parseInt(br.readLine());
-        boolean[] win = new boolean[N + 1];
+        boolean[] win = new boolean[1001];
 
         win[1] = true;
         win[3] = true;
