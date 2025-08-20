@@ -10,49 +10,61 @@ public class 파괴되지_않은_건물 {
 
     public int solution(int[][] board, int[][] skill) {
         int answer = 0;
-        int r = board.length;
-        int c = board[0].length;
-        int[][] sum = new int[r + 1][c + 1];
 
-        for (int[] s : skill) {
-            int type = s[0];
-            int r1 = s[1];
-            int c1 = s[2];
-            int r2 = s[3];
-            int c2 = s[4];
-            int degree = s[5];
+        int n = board.length;
+        int m = board[0].length;
+        int[][] preSum = new int[n + 1][m + 1];
+
+        // 차분 배열을 사용
+        for (int[] turn : skill) {
+            int type = turn[0];
+            int r1 = turn[1];
+            int c1 = turn[2];
+            int r2 = turn[3];
+            int c2 = turn[4];
+            int degree = turn[5];
+
             if (type == 1) {
-                sum[r1][c1] -= degree;
-                sum[r1][c2 + 1] += degree;
-                sum[r2 + 1][c1] += degree;
-                sum[r2 + 1][c2 + 1] -= degree;
+                preSum[r1][c1] -= degree;
+                preSum[r1][c2 + 1] += degree;
+                preSum[r2 + 1][c1] += degree;
+                preSum[r2 + 1][c2 + 1] -= degree;
             } else {
-                sum[r1][c1] += degree;
-                sum[r1][c2 + 1] -= degree;
-                sum[r2 + 1][c1] -= degree;
-                sum[r2 + 1][c2 + 1] += degree;
+                preSum[r1][c1] += degree;
+                preSum[r1][c2 + 1] -= degree;
+                preSum[r2 + 1][c1] -= degree;
+                preSum[r2 + 1][c2 + 1] += degree;
             }
         }
 
         // 누적합 계산
-        // 위 -> 아래
-        for (int j = 0; j <= c; j++) {
-            for (int i = 1; i <= r; i++) {
-                sum[i][j] += sum[i - 1][j];
-            }
-        }
-
         // 왼 -> 오
-        for (int i = 0; i <= r; i++) {
-            for (int j = 1; j <= c; j++) {
-                sum[i][j] += sum[i][j - 1];
+        for (int i = 0; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                preSum[i][j] += preSum[i][j - 1];
             }
         }
 
-        for (int i = 0; i < r; i++) {
-            for (int j = 0; j < c; j++) {
-                if (board[i][j] + sum[i][j] > 0)
+        // 위 -> 아래
+        for (int j = 0; j <= m; j++) {
+            for (int i = 1; i <= n; i++) {
+                preSum[i][j] += preSum[i - 1][j];
+            }
+        }
+
+        // 원래 배열에 더하기
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                board[i][j] += preSum[i][j];
+            }
+        }
+
+        // 파괴되지 않은 건물 계산
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (board[i][j] > 0) {
                     answer++;
+                }
             }
         }
 
