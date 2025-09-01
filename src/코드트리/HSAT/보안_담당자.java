@@ -1,8 +1,5 @@
 package 코드트리.HSAT;
 
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 public class 보안_담당자 {
@@ -25,7 +22,6 @@ public class 보안_담당자 {
             }
         }
 
-        boolean isValid = true;
         int closeNeed = len / 2 - close;
         int check = 0;
 
@@ -47,11 +43,14 @@ public class 보안_담당자 {
 
             // 뒤에서 부터 계산했을 때 들어온 사람이 더 많음
             if (check > 0) {
-                isValid = false;
                 break;
             }
         }
 
-        System.out.println(isValid ? "Yes" : "No");
+        if(check == 0){
+            System.out.println("Yes");
+        }else{
+            System.out.println("No");
+        }
     }
 }
