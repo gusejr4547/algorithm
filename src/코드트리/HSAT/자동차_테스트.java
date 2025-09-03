@@ -1,6 +1,8 @@
 package 코드트리.HSAT;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class 자동차_테스트 {
@@ -18,15 +20,32 @@ public class 자동차_테스트 {
         // 오름차순 정렬
         Arrays.sort(a);
 
-        for (int query : queries) {
-            int idx = binarySearch(a, query);
-
-            if (idx != -1) {
-                System.out.println(idx * (n - 1 - idx));
-            } else {
-                System.out.println(0);
-            }
+        // Map 사용 숫자, idx 맵핑
+        Map<Integer, Integer> invert = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            invert.put(a[i], i);
         }
+
+        StringBuilder sb = new StringBuilder();
+        for (int query : queries) {
+            if (invert.containsKey(query)) {
+                int idx = invert.get(query);
+                sb.append(idx * (n - 1 - idx));
+            } else {
+                sb.append(0);
+            }
+            sb.append("\n");
+
+//            int idx = binarySearch(a, query);
+//
+//            if (idx != -1) {
+//                System.out.println(idx * (n - 1 - idx));
+//            } else {
+//                System.out.println(0);
+//            }
+        }
+
+        System.out.println(sb);
     }
 
     private static int binarySearch(int[] arr, int target) {
