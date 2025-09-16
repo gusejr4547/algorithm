@@ -38,11 +38,12 @@ public class Garage_Game {
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 if (!visit[i][j]) {
+                    int color = grid[i][j];
                     // 선택한 영역에서 확장영역 찾기
                     List<Point> deleteList = spreadArea(i, j, grid, visit);
 
                     // grid 복제
-                    int[][] copyGrid = copy(grid);
+//                    int[][] copyGrid = copy(grid);
 
                     // 점수 계산
                     int sum = deleteList.size();
@@ -54,21 +55,38 @@ public class Garage_Game {
                         minX = Math.min(minX, p.x);
 
                         // 삭제
-                        copyGrid[p.y][p.x] = 0;
+                        grid[p.y][p.x] = 0;
                     }
                     sum += (maxY - minY + 1) * (maxX - minX + 1);
 
                     // 사라진 영역 채우기
-                    dropCar(copyGrid);
+                    List<Change> changeList = dropCar(grid);
 
                     // 다음 턴으로
-                    deleteCar(turn + 1, score + sum, copyGrid);
+                    deleteCar(turn + 1, score + sum, grid);
+
+                    // 복구
+                    recovery(grid, deleteList, changeList, color);
                 }
             }
         }
     }
 
-    private static void dropCar(int[][] grid) {
+    private static void recovery(int[][] grid, List<Point> deleteList, List<Change> changeList, int deletedColor) {
+        // changeList에서 역순으로 복구
+        for (int i = changeList.size() - 1; i >= 0; i--) {
+            Change c = changeList.get(i);
+            grid[c.ny][c.nx] = grid[c.y][c.x];
+        }
+
+        // deleteList 복구
+        for (Point p : deleteList) {
+            grid[p.y][p.x] = deletedColor;
+        }
+    }
+
+    private static List<Change> dropCar(int[][] grid) {
+        List<Change> changeList = new ArrayList<>();
         for (int j = 0; j < N; j++) {
             for (int i = 0; i < N; i++) {
                 if (grid[i][j] == 0) {
@@ -80,11 +98,13 @@ public class Garage_Game {
                         break;
                     }
 
+                    changeList.add(new Change(i, j, next, j));
                     grid[i][j] = grid[next][j];
                     grid[next][j] = 0;
                 }
             }
         }
+        return changeList;
     }
 
     private static int[][] copy(int[][] grid) {
@@ -129,6 +149,18 @@ public class Garage_Game {
         public Point(int y, int x) {
             this.y = y;
             this.x = x;
+        }
+    }
+
+    private static class Change {
+        int y, x;
+        int ny, nx;
+
+        public Change(int y, int x, int ny, int nx) {
+            this.y = y;
+            this.x = x;
+            this.ny = ny;
+            this.nx = nx;
         }
     }
 }
