@@ -29,9 +29,52 @@ public class P2261_가장_가까운_두_점 {
         Arrays.sort(points, (o1, o2) -> Integer.compare(o1.x, o2.x));
 
         // 분할
-        int answer = closestPair(0, N - 1);
+//        int answer = closestPair(0, N - 1);
+
+        // 라인 스위핑
+        int answer = lineSweeping();
 
         System.out.println(answer);
+    }
+
+    private static int lineSweeping() {
+        // TreeSet → Comparator.compare() == 0 이면 동일 취급
+        TreeSet<Point> set = new TreeSet<>((o1, o2) ->
+                o1.y == o2.y ? Integer.compare(o1.x, o2.x) : Integer.compare(o1.y, o2.y));
+        int minDist = getSquareDistance(points[0], points[1]);
+
+        // 탐색은 points[2]부터, 0,1은 최소거리 후보
+        set.add(points[0]);
+        set.add(points[1]);
+
+        int leftIdx = 0;
+        for (int rightIdx = 2; rightIdx < N; rightIdx++) {
+            // 왼쪽 점 부터 rightIdx와 x거리 계산해서 minDist보다 크면 set에서 제외
+            while (leftIdx < rightIdx) {
+
+                int xDist = (points[rightIdx].x - points[leftIdx].x) * (points[rightIdx].x - points[leftIdx].x);
+                if (xDist > minDist) {
+                    set.remove(points[leftIdx]);
+                    leftIdx++;
+                } else {
+                    break;
+                }
+            }
+
+            // rightIdx의 y거리가 minDist 이하의 점 비교해서 minDist 갱신
+            int range = (int) Math.sqrt(minDist) + 1; // 소수점 버려지는거 보정
+            TreeSet<Point> subSet = (TreeSet<Point>) set.subSet(
+                    new Point(-100000, points[rightIdx].y - range),
+                    new Point(100000, points[rightIdx].y + range));
+
+            for (Point p : subSet) {
+                minDist = Math.min(minDist, getSquareDistance(points[rightIdx], p));
+            }
+
+            set.add(points[rightIdx]);
+        }
+
+        return minDist;
     }
 
     private static int closestPair(int left, int right) {
