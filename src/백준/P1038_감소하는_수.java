@@ -26,10 +26,9 @@ public class P1038_감소하는_수 {
             for (int i = 0; i <= 9; i++) {
                 make(1, i);
             }
+            Collections.sort(numList);
+            System.out.println(numList.get(N));
         }
-
-        Collections.sort(numList);
-        System.out.println(numList.get(N));
     }
 
     // num을 시작으로하는 감소하는 수
