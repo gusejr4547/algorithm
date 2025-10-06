@@ -1,8 +1,6 @@
 package 프로그래머스.KAKAO_WINTER_INTERNSHIP_2024;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class 도넛과_막대_그래프 {
     public static void main(String[] args) {
@@ -11,72 +9,126 @@ public class 도넛과_막대_그래프 {
         System.out.println(Arrays.toString(Main.solution(edges)));
     }
 
-    List<Integer>[] adj;
-    int[] inEdge;
 
     public int[] solution(int[][] edges) {
         int[] answer = new int[4];
-        // 임의의 정점 => 나가는 간선이 2이상이고 들어오는 간선이 없음
-        // 막대 => 나가는 간선이 없는 노드 1개 존재
-        // 도넛 => 모든 노드 간선 나가는거 들어오는거 1개존재
-        // 8자 => 1개 노드 들어오는거 2개 나가는거 2개, 나머지 노드 들어오는거 1개 나가는거 1개
 
-        int maxNode = 0;
+        Map<Integer, InOut> counts = new HashMap<>();
+
         for (int[] edge : edges) {
-            maxNode = Math.max(maxNode, Math.max(edge[0], edge[1]));
+            int a = edge[0];
+            int b = edge[1];
+            // a -> b
+            if (!counts.containsKey(a)) {
+                counts.put(a, new InOut(0, 0));
+            }
+            if (!counts.containsKey(b)) {
+                counts.put(b, new InOut(0, 0));
+            }
+
+            counts.get(a).out += 1;
+            counts.get(b).in += 1;
         }
 
-        inEdge = new int[maxNode + 1];
-        adj = new List[maxNode + 1];
-        for (int i = 0; i <= maxNode; i++) {
-            adj[i] = new ArrayList<>();
-        }
-        for (int[] edge : edges) {
-            adj[edge[0]].add(edge[1]);
-            inEdge[edge[1]]++;
-        }
+        for (Integer nodeNum : counts.keySet()) {
+            InOut info = counts.get(nodeNum);
 
-        int startNode = findStartNode();
-        answer[0] = startNode;
-        int totalGraph = adj[startNode].size();
-
-//        removeEdge(startNode); // 지우면 원래 연결 안된 노드랑 구분이 안됨.
-
-//        System.out.println(Arrays.toString(inEdge));
-
-
-        for (int i = 1; i <= maxNode; i++) {
-            if (i == startNode) continue;
-            // 막대
-            if (adj[i].isEmpty() && inEdge[i] >= 1) {
+            // 임의의 정점 => 나가는게 2개 이상이고 들어오는 edge가 없음.
+            if (info.out >= 2 && info.in == 0) {
+                answer[0] = nodeNum;
+            }
+            // 막대모양
+            else if (info.out == 0 && info.in >= 1) {
                 answer[2]++;
-//                System.out.println(i);
             }
-            // 8자
-            else if (adj[i].size() >= 2 && inEdge[i] >= 2) {
+            // 8자모양
+            else if (info.out >= 2 && info.in >= 2) {
                 answer[3]++;
-//                System.out.println(i);
             }
         }
 
-        // 도넛
-        answer[1] = totalGraph - answer[2] - answer[3];
+        // 나머지는 도넛모양
+        answer[1] = counts.get(answer[0]).out - answer[2] - answer[3];
 
         return answer;
     }
 
-    private void removeEdge(int startNode) {
-        for (int node : adj[startNode]) {
-            inEdge[node]--;
+    private static class InOut {
+        int in, out;
+
+        public InOut(int in, int out) {
+            this.in = in;
+            this.out = out;
         }
     }
 
-    private int findStartNode() {
-        for (int i = 1; i < adj.length; i++) {
-            if (adj[i].size() >= 2 && inEdge[i] == 0) {
-                return i;
-            }
-        }
-        return -1;
-    }
+
+//    List<Integer>[] adj;
+//    int[] inEdge;
+//
+//    public int[] solution(int[][] edges) {
+//        int[] answer = new int[4];
+//        // 임의의 정점 => 나가는 간선이 2이상이고 들어오는 간선이 없음
+//        // 막대 => 나가는 간선이 없는 노드 1개 존재
+//        // 도넛 => 모든 노드 간선 나가는거 들어오는거 1개존재
+//        // 8자 => 1개 노드 들어오는거 2개 나가는거 2개, 나머지 노드 들어오는거 1개 나가는거 1개
+//
+//        int maxNode = 0;
+//        for (int[] edge : edges) {
+//            maxNode = Math.max(maxNode, Math.max(edge[0], edge[1]));
+//        }
+//
+//        inEdge = new int[maxNode + 1];
+//        adj = new List[maxNode + 1];
+//        for (int i = 0; i <= maxNode; i++) {
+//            adj[i] = new ArrayList<>();
+//        }
+//        for (int[] edge : edges) {
+//            adj[edge[0]].add(edge[1]);
+//            inEdge[edge[1]]++;
+//        }
+//
+//        int startNode = findStartNode();
+//        answer[0] = startNode;
+//        int totalGraph = adj[startNode].size();
+//
+////        removeEdge(startNode); // 지우면 원래 연결 안된 노드랑 구분이 안됨.
+//
+////        System.out.println(Arrays.toString(inEdge));
+//
+//
+//        for (int i = 1; i <= maxNode; i++) {
+//            if (i == startNode) continue;
+//            // 막대
+//            if (adj[i].isEmpty() && inEdge[i] >= 1) {
+//                answer[2]++;
+////                System.out.println(i);
+//            }
+//            // 8자
+//            else if (adj[i].size() >= 2 && inEdge[i] >= 2) {
+//                answer[3]++;
+////                System.out.println(i);
+//            }
+//        }
+//
+//        // 도넛
+//        answer[1] = totalGraph - answer[2] - answer[3];
+//
+//        return answer;
+//    }
+//
+//    private void removeEdge(int startNode) {
+//        for (int node : adj[startNode]) {
+//            inEdge[node]--;
+//        }
+//    }
+//
+//    private int findStartNode() {
+//        for (int i = 1; i < adj.length; i++) {
+//            if (adj[i].size() >= 2 && inEdge[i] == 0) {
+//                return i;
+//            }
+//        }
+//        return -1;
+//    }
 }
