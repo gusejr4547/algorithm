@@ -21,12 +21,12 @@ public class 표현_가능한_이진트리 {
             // 길이에 맞게 포화 이진트리
             // 1 3 7 15
             // 포화 이진트리 노드 개수 = 2^n -1
-            int height = 1;
-            while (binary.length() > Math.pow(2, height) - 1) {
-                height++;
+            int total = 1;
+            while (binary.length() > total) {
+                total = total * 2 + 1;
             }
             // 길이만큼 앞에 0으로 padding
-            binary = zeroPadding(binary, (long) Math.pow(2, height) - 1);
+            binary = "0".repeat(total - binary.length()) + binary;
 
             // binary의 중간이 root
             // 양 옆으로 재귀로 가면서 subtree의 root가 0이면 불가능
@@ -57,11 +57,8 @@ public class 표현_가능한_이진트리 {
         }
 
         // 왼쪽 && 오른쪽
-        if (str.charAt(mid) == '1') {
-            return isMake(str, true, left, mid - 1) && isMake(str, true, mid + 1, right);
-        } else {
-            return isMake(str, false, left, mid - 1) && isMake(str, false, mid + 1, right);
-        }
+        boolean current = (str.charAt(mid) == '1');
+        return isMake(str, current, left, mid - 1) && isMake(str, current, mid + 1, right);
     }
 
     private String zeroPadding(String str, long length) {
