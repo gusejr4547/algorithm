@@ -1,4 +1,4 @@
-package 프로그래머스;
+package 프로그래머스.KAKAO_BLIND_RECRUITMENT_2022;
 
 public class 사라지는_발판 {
     public static void main(String[] args) {

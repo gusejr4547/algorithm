@@ -1,4 +1,4 @@
-package 프로그래머스;
+package 프로그래머스.KAKAO_BLIND_RECRUITMENT_2022;
 
 public class 파괴되지_않은_건물 {
     public static void main(String[] args) {
