@@ -41,30 +41,19 @@ public class P1525_퍼즐 {
             }
 
             // 0 찾기?
-            int zeroIdx = 0;
-            for (int i = 0; i < 9; i++) {
-                if (cur.state.charAt(i) == '0') {
-                    zeroIdx = i;
-                    break;
-                }
-            }
+            int zeroIdx = cur.state.indexOf('0');
 
             // 다음 상태
-            for (int next : adj[zeroIdx]) {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < 9; i++) {
-                    if (i == next) {
-                        sb.append(cur.state.charAt(zeroIdx));
-                    } else if (i == zeroIdx) {
-                        sb.append(cur.state.charAt(next));
-                    } else {
-                        sb.append(cur.state.charAt(i));
-                    }
-                }
+            for (int move : adj[zeroIdx]) {
+                char[] charArr = cur.state.toCharArray();
+                charArr[zeroIdx] = charArr[move];
+                charArr[move] = '0';
 
-                if (!visit.contains(sb.toString())) {
-                    visit.add(sb.toString());
-                    queue.offer(new State(sb.toString(), cur.moveCount + 1));
+                String nextState = new String(charArr);
+
+                if (!visit.contains(nextState)) {
+                    visit.add(nextState);
+                    queue.offer(new State(nextState, cur.moveCount + 1));
                 }
             }
         }
