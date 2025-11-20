@@ -7,7 +7,7 @@ import java.util.StringTokenizer;
 
 public class P16973_직사각형_탈출 {
     static int N, M, H, W, sy, sx, ey, ex;
-    static int[][] grid;
+    static int[][] grid, isBlock;
     static int[] dy = {0, 0, 1, -1};
     static int[] dx = {1, -1, 0, 0};
 
@@ -34,21 +34,16 @@ public class P16973_직사각형_탈출 {
         // 직사각형의 왼쪽위칸 (sy,sx) => (ey, ex) 로 옮기기 위한 최소 이동 횟수
 
         // grid에서 벽있는 부분 포함하는 H,W 위치 전부 못가게 막기
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                if (grid[i][j] == 1) {
-                    // (i,j)좌표를 포함하는 직사각형 좌표
-                    for (int r = i - H + 1; r <= i; r++) {
-                        for (int c = j - W + 1; c <= j; c++) {
-                            if (r >= 0 && c >= 0) {
-                                grid[r][c] = 1;
-                            }
-                        }
-                    }
-                }
+        // prefix sum으로 벽이 있는지 없는지 확인하는게 가장 최적
+        isBlock = new int[N + 1][M + 1];
+        for (int i = 1; i <= N; i++) {
+            for (int j = 1; j <= M; j++) {
+                isBlock[i][j] = grid[i - 1][j - 1] + isBlock[i - 1][j] + isBlock[i][j - 1] - isBlock[i - 1][j - 1];
             }
         }
 
+        int maxY = N - H + 1;
+        int maxX = M - W + 1;
         int answer = -1;
 
         ArrayDeque<State> queue = new ArrayDeque<>();
@@ -67,7 +62,10 @@ public class P16973_직사각형_탈출 {
             for (int d = 0; d < 4; d++) {
                 int ny = cur.y + dy[d];
                 int nx = cur.x + dx[d];
-                if (ny < 0 || nx < 0 || ny >= N - H + 1 || nx >= M - W + 1 || grid[ny][nx] == 1 || visit[ny][nx]) {
+                if (ny < 0 || nx < 0 || ny >= maxY || nx >= maxX || visit[ny][nx]) {
+                    continue;
+                }
+                if (hasWall(ny, nx)) {
                     continue;
                 }
 
@@ -77,6 +75,16 @@ public class P16973_직사각형_탈출 {
         }
 
         System.out.println(answer);
+    }
+
+    private static boolean hasWall(int y, int x) {
+        // (y,x) 기준으로 사각형을 늫으면 범위안에 벽이 있나?
+        int y2 = y + H;
+        int x2 = x + W;
+
+        int wallCount = isBlock[y2][x2] - isBlock[y][x2] - isBlock[y2][x] + isBlock[y][x];
+
+        return wallCount > 0;
     }
 
     private static class State {
