@@ -1,7 +1,6 @@
 package 백준;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
 public class P35033_용사 {
@@ -18,21 +17,52 @@ public class P35033_용사 {
     // N <= 200 000
 
     static List<Integer>[] adj, child;
-    static boolean[] visit;
-    static int[] noroi;
+    static int[] sz;
     static StringBuilder sb;
 
+    // FastScanner (byte-based)
+    static final class FastScanner {
+        private final InputStream in = System.in;
+        private final byte[] buffer = new byte[1 << 16];
+        private int ptr = 0, len = 0;
+
+        private int readByte() throws IOException {
+            if (ptr >= len) {
+                len = in.read(buffer);
+                ptr = 0;
+                if (len <= 0) return -1;
+            }
+            return buffer[ptr++];
+        }
+
+        int nextInt() throws IOException {
+            int c;
+            do c = readByte(); while (c <= ' ' && c != -1);
+            int sign = 1;
+            if (c == '-') { sign = -1; c = readByte(); }
+            int val = 0;
+            while (c > ' ') {
+                val = val * 10 + (c - '0');
+                c = readByte();
+            }
+            return val * sign;
+        }
+    }
+
     public static void main(String[] args) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int N = Integer.parseInt(br.readLine());
+        FastScanner fs = new FastScanner();
+        int N = fs.nextInt();
+
         adj = new List[N + 1];
+        child = new List[N + 1];
         for (int i = 1; i <= N; i++) {
             adj[i] = new ArrayList<>();
+            child[i] = new ArrayList<>();
         }
+
         for (int i = 0; i < N - 1; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int u = Integer.parseInt(st.nextToken());
-            int v = Integer.parseInt(st.nextToken());
+            int u = fs.nextInt();
+            int v = fs.nextInt();
             adj[u].add(v);
             adj[v].add(u);
         }
@@ -41,94 +71,40 @@ public class P35033_용사 {
         // 후위순회?
         // 그냥 후위순회 하면 안되고 가장 낙인이 많이 생기는 서브 트리 부터 후위순회 해야지 최적
 
-        // 트리 만들기
-        visit = new boolean[N + 1];
-        child = new List[N + 1];
-        for (int i = 1; i <= N; i++) {
-            child[i] = new ArrayList<>();
-        }
-        makeTree();
-
-        // 서브트리 없앴을때 최대 낙인 개수 기록
-        noroi = new int[N + 1];
-        getMaxNoroi(1);
+        // 서브트리 사이즈, child 채우기
+        sz = new int[N + 1];
+        calSize(1, 0);
 
         // 정렬
         for (int i = 1; i <= N; i++) {
-            child[i].sort((o1, o2) -> noroi[o2] - noroi[o1]);
+            child[i].sort((o1, o2) -> Integer.compare(sz[o2], sz[o1]));
         }
 
         sb = new StringBuilder();
-        int[] stack = new int[N + 1];
-        int top = 0;
-        stack[top++] = 1; // 루트
-        int[] count = new int[N + 1];
-
-        while (top > 0) {
-            int node = stack[top - 1]; // 가장 위에 있는거
-            // 아직 서브트리 존재
-            if (count[node] < child[node].size()) {
-                int next = child[node].get(count[node]);
-                stack[top++] = next;
-                count[node]++;
-            }
-            // 서브트리 전부 순회했음
-            else {
-                top--;
-                sb.append(node).append(' ');
-            }
-        }
+        postOrder(1, 0);
 
         System.out.println(sb);
     }
 
-    private static void makeTree() {
-        ArrayDeque<Integer> queue = new ArrayDeque<>();
-        queue.offer(1);
-        visit[1] = true;
-
-        while (!queue.isEmpty()) {
-            int cur = queue.poll();
-
-            for (int next : adj[cur]) {
-                if (!visit[next]) {
-                    visit[next] = true;
-                    child[cur].add(next);
-                    queue.offer(next);
-                }
+    private static void calSize(int node, int parent) {
+        sz[node] = 1;
+        for (int next : adj[node]) {
+            if (next == parent) {
+                continue;
             }
+            child[node].add(next);
+            calSize(next, node);
+            sz[node] += sz[next];
         }
     }
 
-    private static int getMaxNoroi(int node) {
-        if (child[node].size() == 0) {
-            return noroi[node] = 0;
-        }
-
-        // 자식 중에 noroi 가장 큰거 2번째로 큰거
-        int first = -1;
-        int second = -1;
-        for (int next : child[node]) {
-            int val = getMaxNoroi(next);
-            if (val > first) {
-                second = first;
-                first = val;
-            } else if (val > second) {
-                second = val;
-            }
-        }
-
-        if (second >= 0) {
-            return noroi[node] = Math.max(first, second + 1);
-        } else {
-            return noroi[node] = first;
-        }
-    }
-
-    private static void postOrder(int node) {
+    private static void postOrder(int node, int parent) {
         // 자식
         for (int next : child[node]) {
-            postOrder(next);
+            if (next == parent) {
+                continue;
+            }
+            postOrder(next, node);
         }
 
         // 서브 루트
