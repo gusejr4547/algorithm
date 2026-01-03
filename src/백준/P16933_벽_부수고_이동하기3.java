@@ -3,7 +3,6 @@ package 백준;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayDeque;
-import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
 public class P16933_벽_부수고_이동하기3 {
@@ -14,36 +13,39 @@ public class P16933_벽_부수고_이동하기3 {
 
     static int[] dy = {0, 0, 1, -1};
     static int[] dx = {1, -1, 0, 0};
+    static int N, M, K, answer;
+    static char[][] map;
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int N = Integer.parseInt(st.nextToken());
-        int M = Integer.parseInt(st.nextToken());
-        int K = Integer.parseInt(st.nextToken());
-        char[][] map = new char[N][M];
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        K = Integer.parseInt(st.nextToken());
+        map = new char[N][M];
         for (int i = 0; i < N; i++) {
             map[i] = br.readLine().toCharArray();
         }
 
-        int answer = 0;
+        answer = -1;
+        bfs();
+        System.out.println(answer);
+    }
+
+    private static void bfs() {
         boolean[][][] visit = new boolean[N][M][K + 1];
-        PriorityQueue<State> queue = new PriorityQueue<>((o1, o2) -> o1.depth - o2.depth);
+        ArrayDeque<State> queue = new ArrayDeque<>();
         // count%2 == 0 낮, 1이면 밤
         queue.offer(new State(0, 0, 0, 0));
+        visit[0][0][0] = true;
 
         while (!queue.isEmpty()) {
             State cur = queue.poll();
 
             if (cur.y == N - 1 && cur.x == M - 1) {
                 answer = cur.depth + 1;
-                break;
+                return;
             }
-
-            if (visit[cur.y][cur.x][cur.count]) {
-                continue;
-            }
-            visit[cur.y][cur.x][cur.count] = true;
 
             for (int d = 0; d < 4; d++) {
                 int ny = cur.y + dy[d];
@@ -56,27 +58,29 @@ public class P16933_벽_부수고_이동하기3 {
                 // 벽
                 if (map[ny][nx] == '1') {
                     // 부수기
-                    if (cur.count < K && !visit[ny][nx][cur.count + 1]) {
+                    if (cur.count < K) {
                         // 낮
                         if (cur.depth % 2 == 0) {
-                            queue.offer(new State(ny, nx, cur.count + 1, cur.depth + 1));
+                            if (!visit[ny][nx][cur.count + 1]) {
+                                visit[ny][nx][cur.count + 1] = true;
+                                queue.offer(new State(ny, nx, cur.count + 1, cur.depth + 1));
+                            }
                         }
                         // 밤
                         else {
-                            queue.offer(new State(ny, nx, cur.count + 1, cur.depth + 2));
+                            queue.offer(new State(cur.y, cur.x, cur.count, cur.depth + 1));
                         }
                     }
                 }
                 // 그냥 이동
                 else {
                     if (!visit[ny][nx][cur.count]) {
+                        visit[ny][nx][cur.count] = true;
                         queue.offer(new State(ny, nx, cur.count, cur.depth + 1));
                     }
                 }
             }
         }
-
-        System.out.println(answer == 0 ? -1 : answer);
     }
 
     private static class State {
