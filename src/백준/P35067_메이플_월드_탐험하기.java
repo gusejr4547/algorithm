@@ -53,15 +53,16 @@ public class P35067_메이플_월드_탐험하기 {
             adj[i].sort((o1, o2) -> Integer.compare(A[o2], A[o1]));
         }
 
-        // i를 루트로하는 노드에서 인접한 다른 노드를 부모로 하는 서브 트리에서 최종 목적지를 계산한 dp
-        dp = new int[N + 1][N + 1];
+        // i를 루트로하는 노드에서 인접한 다른 노드를 부모로 하는 서브 트리에서 최종 목적지를 계산한 dp => 실패
+        // 한 노드에서 갈수있는 다음 노드는 마력 1순위 2순위 뿐이다. 부모 노드가 마력 1순위인 경우 2순위, 그외는 1순위로 이동
+        dp = new int[N + 1][2];
         for (int i = 1; i <= N; i++) {
             makeTreeDP(i, 0);
         }
 
-        for(int[] d : dp){
-            System.out.println(Arrays.toString(d));
-        }
+//        for(int[] d : dp){
+//            System.out.println(Arrays.toString(d));
+//        }
 
         StringBuilder sb = new StringBuilder();
         for (int i = 1; i <= N; i++) {
@@ -72,20 +73,24 @@ public class P35067_메이플_월드_탐험하기 {
     }
 
     private static int makeTreeDP(int node, int parent) {
-        // 미리 계산된 값
-        if (dp[node][parent] != 0) {
-            return dp[node][parent];
-        }
-
         // node에서 parent를 제외한 가장 마력이 큰 곳으로 이동
-        for (int next : adj[node]) {
-            if (parent == next) {
-                continue;
+        // 1. parent가 best => second
+        if (parent == adj[node].get(0)) {
+            if (dp[node][1] != 0) {
+                return dp[node][1];
             }
-            return dp[node][parent] = makeTreeDP(next, node);
+            // second가 없는 경우 => 마지막
+            if (adj[node].size() == 1) {
+                return dp[node][1] = node;
+            }
+            return dp[node][1] = makeTreeDP(adj[node].get(1), node);
         }
-
-        // 다른곳 못가면 자기자신 종료
-        return dp[node][parent] = node;
+        // 2. 그외 => best
+        else {
+            if (dp[node][0] != 0) {
+                return dp[node][0];
+            }
+            return dp[node][0] = makeTreeDP(adj[node].get(0), node);
+        }
     }
 }
