@@ -4,11 +4,53 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
 public class P2109_순회강연 {
     // n <= 10 000
     public static void main(String[] args) throws Exception {
+//        solution1();
+        solution2();
+    }
+
+    public static void solution2() throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = Integer.parseInt(br.readLine());
+        List<Integer>[] lectureList = new List[10001];
+        for (int i = 0; i <= 10000; i++) {
+            lectureList[i] = new ArrayList<>();
+        }
+        int maxDay = 0;
+        for (int i = 0; i < n; i++) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            int p = Integer.parseInt(st.nextToken());
+            int d = Integer.parseInt(st.nextToken());
+
+            lectureList[d].add(p);
+            maxDay = Math.max(maxDay, d);
+        }
+
+        // 강연료 높은거 내림차순 큐
+        PriorityQueue<Integer> pq = new PriorityQueue<>((o1, o2) -> Integer.compare(o2, o1));
+        int answer = 0;
+
+        for (int day = maxDay; day > 0; day--) {
+            // day가 데드라인 강연 추가
+            for (int p : lectureList[day]) {
+                pq.offer(p);
+            }
+
+            // 가장 강연료 높은거 하나 선택
+            if(!pq.isEmpty()){
+                answer += pq.poll();
+            }
+        }
+
+        System.out.println(answer);
+    }
+
+    public static void solution1() throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int n = Integer.parseInt(br.readLine());
         List<Lecture> lectureList = new ArrayList<>();
