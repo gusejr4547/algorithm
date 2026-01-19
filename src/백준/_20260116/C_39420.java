@@ -10,12 +10,15 @@ public class C_39420 {
     // 모든 숫자가 다른 직사각형 몇개?
 
     // N, M <= 1000
+    static int N, M;
+    static int[][] matrix;
+
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        int N = Integer.parseInt(st.nextToken());
-        int M = Integer.parseInt(st.nextToken());
-        int[][] matrix = new int[N][M];
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        matrix = new int[N][M];
         for (int i = 0; i < N; i++) {
             String str = br.readLine();
             for (int j = 0; j < M; j++) {
@@ -27,28 +30,15 @@ public class C_39420 {
         // 숫자 10개니까 10개 이상 칸은 무조건 겹침
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < M; j++) {
-
                 // 사각형 세로
                 for (int h = 1; h <= 10 && i + h - 1 < N; h++) {
                     // 사각형 가로
-                    int maxW = 10 / h;
-                    for (int w = 1; w <= maxW && j + w - 1 < M; w++) {
+                    for (int w = 1; h * w <= 10 && j + w - 1 < M; w++) {
                         int mask = 0;
                         boolean isOk = true;
 
                         // 내부 계산
-                        for (int x = i; x < i + h; x++) {
-                            for (int y = j; y < j + w; y++) {
-                                int bit = 1 << matrix[x][y];
-                                if (((mask & bit)) != 0) {
-                                    isOk = false;
-                                    break;
-                                }
-                                mask |= bit;
-                            }
-                        }
-
-                        if (isOk) {
+                        if (check(i, j, h, w)) {
                             answer++;
                         }
                     }
@@ -58,4 +48,25 @@ public class C_39420 {
 
         System.out.println(answer);
     }
+
+    private static boolean check(int r, int c, int h, int w) {
+        int mask = 0;
+
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                int v = matrix[r + i][c + j];
+
+                // & 계산했는데 0이 아니면 이미 등장한 숫자
+                if ((mask & (1 << v)) != 0) {
+                    return false;
+                }
+
+                // 방문처리
+                mask |= (1 << v);
+            }
+        }
+
+        return true;
+    }
+
 }
