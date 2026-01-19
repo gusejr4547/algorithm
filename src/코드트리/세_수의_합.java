@@ -13,27 +13,37 @@ public class 세_수의_합 {
         int N = Integer.parseInt(st.nextToken());
         int K = Integer.parseInt(st.nextToken());
 
-        Map<Integer, Integer> count1 = new HashMap<>();
-        Map<Integer, Integer> sum = new HashMap<>();
-
-        long answer = 0;
+        Map<Integer, Integer> count = new HashMap<>();
+        int[] arr = new int[N];
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < N; i++) {
             int n = Integer.parseInt(st.nextToken());
 
-            // n을 선택했을 때 3개 수의 합이 K가 되는 것을 만들 수 있나
-            int diff = K - n;
-            if (sum.containsKey(diff)) {
-                answer += sum.get(diff);
+            arr[i] = n;
+            count.put(n, count.getOrDefault(n, 0) + 1);
+        }
+
+        long answer = 0;
+        // 배열 앞에서 순회
+        for (int i = 0; i < N; i++) {
+            // i번째 뒤에부터 사용할꺼기 때문에 count에서 날려
+            if (count.containsKey(arr[i])) {
+                int c = count.get(arr[i]) - 1;
+                if (c == 0) {
+                    count.remove(arr[i]);
+                } else {
+                    count.put(arr[i], c);
+                }
             }
 
-            // n을 이용해 sum을 만들기
-            for (int a : count1.keySet()) {
-                sum.put(n + a, sum.getOrDefault(n + a, 0) + count1.get(a));
-            }
+            for (int j = 0; j < i; j++) {
+                // i, j 번째 수를 사용하고 뒤에 남은 수 1개를 골라서 K 만들기
+                int target = K - arr[i] - arr[j];
 
-            // count1 추가
-            count1.put(n, count1.getOrDefault(n, 0) + 1);
+                if (count.containsKey(target)) {
+                    answer += count.get(target);
+                }
+            }
         }
 
         System.out.println(answer);
