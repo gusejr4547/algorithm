@@ -8,42 +8,25 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 public class P1208_부분수열의_합_2 {
+    static Map<Integer, Integer> leftSum, rightSum;
+    static int[] arr;
+
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
         int N = Integer.parseInt(st.nextToken());
         int S = Integer.parseInt(st.nextToken());
         st = new StringTokenizer(br.readLine());
-        int[] arr = new int[N];
+        arr = new int[N];
         for (int i = 0; i < N; i++) {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        Map<Integer, Integer> leftSum = new HashMap<>();
-        Map<Integer, Integer> rightSum = new HashMap<>();
-        leftSum.put(0, 1);
-        rightSum.put(0, 1);
-        for (int i = 0; i < N / 2; i++) {
-            Map<Integer, Integer> map = new HashMap<>(leftSum);
-            // sum 갱신
-            for (int k : leftSum.keySet()) {
-                int cnt = leftSum.get(k);
-                map.put(k + arr[i], leftSum.getOrDefault(k + arr[i], 0) + cnt);
-            }
+        leftSum = new HashMap<>();
+        rightSum = new HashMap<>();
 
-            leftSum = map;
-        }
-        for (int i = N / 2; i < N; i++) {
-            Map<Integer, Integer> map = new HashMap<>(rightSum);
-            for (int k : rightSum.keySet()) {
-                int cnt = rightSum.get(k);
-                map.put(k + arr[i], rightSum.getOrDefault(k + arr[i], 0) + cnt);
-            }
-            rightSum = map;
-        }
-
-//        System.out.println(leftSum);
-//        System.out.println(rightSum);
+        makeSum(0, N / 2, 0, leftSum);
+        makeSum(N / 2, N, 0, rightSum);
 
         long answer = 0;
 
@@ -59,5 +42,16 @@ public class P1208_부분수열의_합_2 {
         }
 
         System.out.println(answer);
+    }
+
+    private static void makeSum(int idx, int end, int sum, Map<Integer, Integer> map) {
+        if (idx == end) {
+            map.put(sum, map.getOrDefault(sum, 0) + 1);
+            return;
+        }
+
+        makeSum(idx + 1, end, sum, map);
+
+        makeSum(idx + 1, end, sum + arr[idx], map);
     }
 }
