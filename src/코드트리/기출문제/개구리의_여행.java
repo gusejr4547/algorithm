@@ -56,7 +56,8 @@ public class 개구리의_여행 {
 
             // 마지막
             if (cur.y == r2 && cur.x == c2) {
-                continue;
+//                continue;
+                return cur.time;
             }
 
             if (cur.time > time[cur.y][cur.x][cur.jumpPower]) {
@@ -111,12 +112,13 @@ public class 개구리의_여행 {
         }
 
         // 최소 시간
-        int minTime = MAX;
-        for (int k = 1; k <= 5; k++) {
-            minTime = Math.min(minTime, time[r2][c2][k]);
-        }
-
-        return minTime == MAX ? -1 : minTime;
+//        int minTime = MAX;
+//        for (int k = 1; k <= 5; k++) {
+//            minTime = Math.min(minTime, time[r2][c2][k]);
+//        }
+//
+//        return minTime == MAX ? -1 : minTime;
+        return -1;
     }
 
     private static class State {
