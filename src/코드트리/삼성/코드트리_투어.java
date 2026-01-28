@@ -1,4 +1,4 @@
-package 코드트리.기출문제;
+package 코드트리.삼성;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
