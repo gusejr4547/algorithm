@@ -21,27 +21,21 @@ public class P15661_링크와_스타트 {
 
         int answer = Integer.MAX_VALUE;
         // N개의 bit, 0 1로 팀을 구분
-        for (int team = 1; team < (1 << N) - 1; team++) {
-            // 1
-            int teamA = 0;
-            for (int i = 0; i < N; i++) {
-                if ((team & (1 << i)) != 0) {
-                    for (int j = i + 1; j < N; j++) {
-                        if ((team & (1 << j)) != 0) {
-                            teamA += S[i][j] + S[j][i];
-                        }
-                    }
-                }
-            }
+        // 0111과 1000은 같다. => 한사람을 고정하면 중복을 방지할 수 있다.
+        // 마지막 사람 0으로 고정
+        for (int team = 1; team < (1 << (N - 1)); team++) {
 
-            // 0
+            int teamA = 0;
             int teamB = 0;
+
             for (int i = 0; i < N; i++) {
-                if ((team & (1 << i)) == 0) {
-                    for (int j = i + 1; j < N; j++) {
-                        if ((team & (1 << j)) == 0) {
-                            teamB += S[i][j] + S[j][i];
-                        }
+                for (int j = i + 1; j < N; j++) {
+                    if ((team & (1 << i)) != 0 && (team & (1 << j)) != 0) {
+                        teamA += S[i][j] + S[j][i];
+                    }
+
+                    if ((team & (1 << i)) == 0 && (team & (1 << j)) == 0) {
+                        teamB += S[i][j] + S[j][i];
                     }
                 }
             }
