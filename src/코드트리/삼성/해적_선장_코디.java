@@ -5,8 +5,7 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class 해적_선장_코디 {
-    static List<Ship> shipList;
-    static Map<Integer, Integer> id2Idx, changed;
+    static Map<Integer, Ship> idShipMap;
     static PriorityQueue<Ship> ready, reload;
     static Set<Integer> reloadSet;
 
@@ -14,9 +13,7 @@ public class 해적_선장_코디 {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int T = Integer.parseInt(br.readLine());
 
-        shipList = new ArrayList<>();
-        id2Idx = new HashMap<>();
-        changed = new HashMap<>();
+        idShipMap = new HashMap<>();
         ready = new PriorityQueue<>((o1, o2) ->
                 o1.p == o2.p ? Integer.compare(o1.id, o2.id) : Integer.compare(o2.p, o1.p));
         reload = new PriorityQueue<>((o1, o2) -> Integer.compare(o1.reloadEnd, o2.reloadEnd));
@@ -59,19 +56,12 @@ public class 해적_선장_코디 {
 
     private static String attack(int time) {
         // reload에서 현재 시간 이전꺼 전부 뽑아서 ready에
-        // p 갱신 필요한거는 바꿔서 넣기
         while (!reload.isEmpty() && reload.peek().reloadEnd <= time) {
             Ship s = reload.poll();
-            if (changed.containsKey(s.id)) {
-                if (changed.get(s.id) != s.p) {
-                    ready.offer(new Ship(s.id, changed.get(s.id), s.r));
-                } else {
-                    ready.offer(s);
-                }
-            } else {
-                ready.offer(s);
-            }
-            reloadSet.remove(s.id);
+            Ship o = idShipMap.get(s.id);
+
+            ready.offer(new Ship(o.id, o.p, o.r));
+            reloadSet.remove(o.id);
         }
 
         // ready에서 최대 5개 뽑기
@@ -87,7 +77,7 @@ public class 해적_선장_코디 {
             if (reloadSet.contains(s.id)) {
                 continue;
             }
-            if (changed.containsKey(s.id) && changed.get(s.id) != s.p) {
+            if (s.p != idShipMap.get(s.id).p) {
                 continue;
             }
 
@@ -103,15 +93,12 @@ public class 해적_선장_코디 {
     }
 
     private static void change(int id, int pw) {
-        int idx = id2Idx.get(id);
-        shipList.get(idx).p = pw;
-        changed.put(id, pw);
-        ready.offer(new Ship(id, pw, shipList.get(idx).r));
+        idShipMap.get(id).p = pw;
+        ready.offer(new Ship(id, pw, idShipMap.get(id).r));
     }
 
     private static void addShip(int id, int p, int r) {
-        shipList.add(new Ship(id, p, r));
-        id2Idx.put(id, shipList.size() - 1);
+        idShipMap.put(id, new Ship(id, p, r));
         ready.add(new Ship(id, p, r));
     }
 
