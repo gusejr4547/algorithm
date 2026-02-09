@@ -32,8 +32,8 @@ public class P2295_세_수의_합 {
         // arr[i] 만들수있는지?
         int answer = 0;
         for (int i = N - 1; i >= 0; i--) {
-            for (int n : sumSet) {
-                if (numSet.contains(arr[i] - n)) {
+            for (int n : numSet) {
+                if (sumSet.contains(arr[i] - n)) {
                     answer = arr[i];
                     break;
                 }
