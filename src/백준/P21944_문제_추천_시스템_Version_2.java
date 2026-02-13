@@ -61,7 +61,7 @@ public class P21944_문제_추천_시스템_Version_2 {
                     Problem problem = LTreeSet.ceiling(new Problem(-1, l, -1));
                     sb.append(problem == null ? -1 : problem.p).append('\n');
                 } else {
-                    Problem problem = LTreeSet.floor(new Problem(-1, l, -1));
+                    Problem problem = LTreeSet.lower(new Problem(-1, l, -1));
                     sb.append(problem == null ? -1 : problem.p).append('\n');
                 }
             } else if ("add".equals(op)) {
