@@ -57,24 +57,20 @@ public class 프렌즈4블록 {
         int N = grid.length;
         int M = grid[0].length;
         for (int j = 0; j < M; j++) {
-            int i = N - 1;// 저장할 위치
-            int k = N - 1;// 탐색 포인터
-            while (i >= 0 && k >= 0) {
-                // 빈공간 찾으면 위에 블록 탐색
-                if (grid[i][j] == '.') {
-                    k = i - 1;
-                    while (k >= 0) {
-                        if (grid[k][j] != '.') {
-                            break;
-                        }
-                        k--;
+            int k = N - 1;// 갱신 위치
+            for (int i = N - 1; i >= 0; i--) {
+                if (grid[i][j] != '.') {
+                    grid[k][j] = grid[i][j];
+                    if (k != i) {
+                        grid[i][j] = '.';
                     }
-                    if (k >= 0) {
-                        grid[i][j] = grid[k][j];
-                        grid[k][j] = '.';
-                    }
+                    k--;
                 }
-                i--;
+            }
+
+            // 위쪽은 전부 .
+            for (int i = k; i >= 0; i--) {
+                grid[i][j] = '.';
             }
         }
     }
@@ -87,7 +83,7 @@ public class 프렌즈4블록 {
         for (int i = 0; i < N - 1; i++) {
             for (int j = 0; j < M - 1; j++) {
                 // 알파벳이 전부 같으면
-                if (Character.isAlphabetic(grid[i][j])
+                if (grid[i][j] != '.'
                         && grid[i][j] == grid[i][j + 1]
                         && grid[i][j] == grid[i + 1][j]
                         && grid[i][j] == grid[i + 1][j + 1]) {
