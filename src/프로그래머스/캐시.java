@@ -1,8 +1,6 @@
 package 프로그래머스;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class 캐시 {
     public static void main(String[] args) {
@@ -26,50 +24,28 @@ public class 캐시 {
         }
 
         int answer = 0;
-        Map<String, Integer> usedTime = new HashMap<>();
-        PriorityQueue<Cache> pq = new PriorityQueue<>((o1, o2) -> o1.time - o2.time);
+        List<String> cache = new ArrayList<>();
 
-        for (int i = 0; i < cities.length; i++) {
-            String city = cities[i].toUpperCase();
+        for (String city : cities) {
+            city = city.toUpperCase();
+
             // hit
-            if (usedTime.containsKey(city)) {
-                pq.offer(new Cache(city, i));
-                usedTime.put(city, i);
+            if (cache.remove(city)) {
+                cache.add(city);
                 answer += HIT;
             }
             // miss
             else {
-                // 교체 필요
-                if (usedTime.size() == cacheSize) {
-                    // pq에서 유효한거 1개 제거
-                    while (!pq.isEmpty()) {
-                        Cache c = pq.poll();
-                        // c.city가 usedTime에 있고, time도 같으면 break
-                        if (usedTime.containsKey(c.city) && usedTime.get(c.city) == c.time) {
-                            // city를 usedTime에서 제거
-                            usedTime.remove(c.city);
-                            break;
-                        }
-                    }
+                // 가득참 => 앞에꺼 제거
+                if (cache.size() >= cacheSize) {
+                    cache.remove(0);
                 }
 
-                // 새거 넣기
-                pq.offer(new Cache(city, i));
-                usedTime.put(city, i);
+                cache.add(city);
                 answer += MISS;
             }
         }
 
         return answer;
-    }
-
-    private class Cache {
-        String city;
-        int time;
-
-        public Cache(String city, int time) {
-            this.city = city;
-            this.time = time;
-        }
     }
 }
