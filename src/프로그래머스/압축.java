@@ -10,52 +10,57 @@ public class 압축 {
 
     }
 
-    Map<String, Integer> dict;
-//    Node trie;
+    Node trie;
 
     public int[] solution(String msg) {
-        init();
+        // 초기화
+        trie = new Node(0);
+        int idx = 1;
+        for (char c = 'A'; c <= 'Z'; c++) {
+            trie.child.put(c, new Node(idx++));
+        }
 
         List<Integer> result = new ArrayList<>();
-        int idx = 27;
-        for (int i = 0; i < msg.length(); i++) {
-            // 현재 위치에서 사전에 있는 가장 긴 문자열
-            String word = "";
-            int next = i;
-            for (int j = i + 1; j <= msg.length(); j++) {
-                String str = msg.substring(i, j);
-                if (dict.containsKey(str)) {
-                    word = str;
-                    next = j;
-                } else {
+        // 문자열
+        int i = 0;
+        while (i < msg.length()) {
+            Node cur = trie;
+            int len = 0; // 일치하는 문자열 길이
+
+            for (int j = i; j < msg.length(); j++) {
+                char c = msg.charAt(j);
+
+                // 자식노드 없으면 종료
+                if (!cur.child.containsKey(c)) {
                     break;
                 }
+
+                cur = cur.child.get(c);
+                len++;
             }
 
-            // 색인번호 출력
-            result.add(dict.get(word));
+            // 찾은거 출력
+            result.add(cur.index);
 
-            // 새 단어 등록
-            if (next < msg.length()) {
-                dict.put(word + String.valueOf(msg.charAt(next)), idx++);
+            // 새로운거 등록
+            if (i + len < msg.length()) {
+                char c = msg.charAt(i + len);
+                cur.child.put(c, new Node(idx++));
             }
 
-            // i 변경
-            i += word.length() - 1;
+            // i 이동
+            i += len;
         }
 
         return result.stream().mapToInt(Integer::intValue).toArray();
     }
 
-    public void init() {
-        dict = new HashMap<>();
-        for (char i = 'A'; i <= 'Z'; i++) {
-            dict.put(String.valueOf(i), i - 'A' + 1);
+    public class Node {
+        int index;
+        Map<Character, Node> child = new HashMap<>();
+
+        public Node(int index) {
+            this.index = index;
         }
     }
-
-//    public class Node {
-//        int index;
-//        Map<Character, Node> child;
-//    }
 }
