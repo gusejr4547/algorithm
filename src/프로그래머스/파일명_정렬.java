@@ -26,15 +26,18 @@ public class 파일명_정렬 {
             String head = file.substring(0, idx);
 
             // NUMBER = 숫자외 다른문자 나오기전까지
-
+            int numberStart = idx;
             while (idx < file.length()) {
-                // 숫자가 아니면 break
                 if (!Character.isDigit(file.charAt(idx))) {
+                    break;
+                }
+                // 5글자가 넘어가면 그 뒤는 TAIL로 취급해야 함
+                if (idx - numberStart >= 5) {
                     break;
                 }
                 idx++;
             }
-            String number = file.substring(head.length(), idx);
+            String number = file.substring(numberStart, idx);
 
             // TAIL = 남은 부분
             String tail = file.substring(idx);
