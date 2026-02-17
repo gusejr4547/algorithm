@@ -40,30 +40,26 @@ public class 파일명_정렬 {
             String number = file.substring(numberStart, idx);
 
             // TAIL = 남은 부분
-            String tail = file.substring(idx);
+//            String tail = file.substring(idx);
 
             // 저장
-            fileList.add(new File(head, number, tail));
+            fileList.add(new File(file, head, number));
         }
 
         // 정렬
         fileList.sort((o1, o2) ->
                 o1.upperHead.equals(o2.upperHead) ? Integer.compare(o1.number, o2.number) : o1.upperHead.compareTo(o2.upperHead));
 
-        return fileList.stream().map(o -> o.head + o.numberStr + o.tail).toArray(String[]::new);
+        return fileList.stream().map(o -> o.original).toArray(String[]::new);
     }
 
     private class File {
-        String head;
-        String numberStr;
-        String tail;
+        String original;
         String upperHead;
         int number;
 
-        public File(String head, String numberStr, String tail) {
-            this.head = head;
-            this.numberStr = numberStr;
-            this.tail = tail;
+        public File(String original, String head, String numberStr) {
+            this.original = original;
             this.upperHead = head.toUpperCase();
             this.number = Integer.parseInt(numberStr);
         }
