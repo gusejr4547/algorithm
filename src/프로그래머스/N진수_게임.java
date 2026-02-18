@@ -14,6 +14,10 @@ public class N진수_게임 {
     // t 미리 구할 숫자 개수 <= 1000
     // m 참여 인원 <= 100
     // p 순서
+
+    // 인덱스 0~15에 해당하는 문자를 미리 정의
+    char[] codes = "0123456789ABCDEF".toCharArray();
+
     public String solution(int n, int t, int m, int p) {
         // 내가 반환할 문자를 전부 구할 수 있는 최종 문자열 길이
         int totalLength = m * (t - 1) + p;
@@ -42,33 +46,11 @@ public class N진수_게임 {
         if (num == 0) {
             return "0";
         }
+
         StringBuilder sb = new StringBuilder();
         while (num > 0) {
-            int r = num % base;
             // 10 이상이면 A, B, C, D, E, F
-            switch (r) {
-                case 10:
-                    sb.append('A');
-                    break;
-                case 11:
-                    sb.append('B');
-                    break;
-                case 12:
-                    sb.append('C');
-                    break;
-                case 13:
-                    sb.append('D');
-                    break;
-                case 14:
-                    sb.append('E');
-                    break;
-                case 15:
-                    sb.append('F');
-                    break;
-                default:
-                    sb.append(r);
-                    break;
-            }
+            sb.append(codes[num % base]);
             num /= base;
         }
         return sb.reverse().toString();
