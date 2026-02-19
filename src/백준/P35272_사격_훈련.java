@@ -18,8 +18,8 @@ public class P35272_사격_훈련 {
         // 내가 몇발 다른사람에게 쏜다. 적절한 개수를 쏴서 기대값을 높이는것이 목적
         // N <= 20
 
-        double[][] A = new double[N][N]; // 사격 결과 확률
-        double[][] B = new double[N][N];
+        double[][] A = new double[N + 1][N + 1]; // 사격 결과 확률
+        double[][] B = new double[N + 1][N + 1];
 
         // 0발 중 0발 적중 확률 무조건 1
         A[0][0] = 1.0;
