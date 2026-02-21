@@ -40,8 +40,10 @@ public class P35273_착신_전환 {
         while (!queue.isEmpty()) {
             int x = queue.poll();
             order[idx++] = x;
-            inDegree[x]--;
-            if (inDegree[A[x]] == 0) {
+
+            int next = A[x];
+            inDegree[next]--;
+            if (inDegree[next] == 0) {
                 queue.offer(x);
             }
         }
