@@ -44,7 +44,7 @@ public class P35273_착신_전환 {
             int next = A[x];
             inDegree[next]--;
             if (inDegree[next] == 0) {
-                queue.offer(x);
+                queue.offer(next);
             }
         }
 
