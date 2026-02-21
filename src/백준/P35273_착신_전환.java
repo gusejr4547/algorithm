@@ -41,7 +41,7 @@ public class P35273_착신_전환 {
             int x = queue.poll();
             order[idx++] = x;
             inDegree[x]--;
-            if (inDegree[x] == 0) {
+            if (inDegree[A[x]] == 0) {
                 queue.offer(x);
             }
         }
