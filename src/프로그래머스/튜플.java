@@ -16,38 +16,27 @@ public class 튜플 {
         // ---
         // s 중에서 { } 에 가장 많은 원소 들어가 있는 것 까지 계속 수행
 
-        Map<Integer, List<Integer>> m = new HashMap<>();
+        // 양끝 괄호 '{{', '}}' 제거 후 '},{' 기준으로 분리
+        s = s.substring(2, s.length() - 2);
+        String[] arr = s.split("},\\{");
 
-        int i = 1;
-        while (i < s.length() - 1) {
-            if ('{' == s.charAt(i)) {
-                int j = i + 1;
-                while ('}' != s.charAt(j)) {
-                    j++;
-                }
+        // 길이 순서 정렬
+        Arrays.sort(arr, (o1, o2) -> o1.length() - o2.length());
 
-                StringTokenizer st = new StringTokenizer(s.substring(i + 1, j), ",");
-                List<Integer> list = new ArrayList<>();
-                while (st.hasMoreTokens()) {
-                    list.add(Integer.parseInt(st.nextToken()));
-                }
 
-                m.put(list.size(), list);
-
-                i = j;
-            }
-            i++;
-        }
-
+        Set<Integer> set = new HashSet<>();
         List<Integer> answer = new ArrayList<>();
 
-        for (int size = 1; size <= m.size(); size++) {
-            List<Integer> list = m.get(size);
-            list.removeAll(answer);
-
-            answer.add(list.get(0));
+        for (String str : arr) {
+            StringTokenizer st = new StringTokenizer(str, ",");
+            while (st.hasMoreTokens()) {
+                int n = Integer.parseInt(st.nextToken());
+                if (!set.contains(n)) {
+                    set.add(n);
+                    answer.add(n);
+                }
+            }
         }
-
 
         return answer.stream().mapToInt(v -> v).toArray();
     }
