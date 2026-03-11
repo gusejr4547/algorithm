@@ -47,15 +47,17 @@ public class 바이러스_파이프 {
     }
 
     public void dfs(int openCnt, int n, int k) {
+        // 최대 감염자 수를 갱신합니다.
+        int cnt = 0;
+        for (int i = 1; i <= n; i++) {
+            if (isInfect[i]) {
+                cnt++;
+            }
+        }
+        answer = Math.max(answer, cnt);
+
         // 마지막
         if (openCnt == k) {
-            int cnt = 0;
-            for (int i = 1; i <= n; i++) {
-                if (isInfect[i]) {
-                    cnt++;
-                }
-            }
-            answer = Math.max(answer, cnt);
             return;
         }
 
@@ -91,8 +93,11 @@ public class 바이러스_파이프 {
                 }
             }
 
+            // 새로운 감염이 없으면 다음으로 가는거 의미없다.
             // 다음
-            dfs(openCnt + 1, n, k);
+            if(!addP.isEmpty()){
+                dfs(openCnt + 1, n, k);
+            }
 
             // 초기화
             for (int node : addP) {
