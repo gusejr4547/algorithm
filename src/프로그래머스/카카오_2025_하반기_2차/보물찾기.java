@@ -10,8 +10,20 @@ public class 보물찾기 {
 
     public int solution(int[] depth, int money, Function<Integer, Integer> excavate) {
         int w = depth.length;
-        int l = 0;
-        int r = w - 1;
+
+        int[][] dp = new int[w][w];
+        // Min-Max 전략
+        // 최악의 경우에 최소비용
+        // dp[L][R] L, R 사이에 보물이 있을 때 최소-최대비용
+        // L ~ R 구간 중 하나를 선택했을때 이후 dp값이 가장 적은 것을 선택해야함.
+
+        // k번째를 선택했는데 보물이 두 구간 중 더 비용이 많이 드는 곳에 있는 경우가 최악
+        // dp[L][R] = depth[k] + Math.max(dp[L][k-1], dp[k+1][R]);
+        // L ~ R 사이 k를 전부 다 계산해서 가장 작은 값을 가지는 k를 선택해야함
+
+
+        int l = 1;
+        int r = w;
 
         while (l <= r) {
             int mid = (l + r) / 2;
