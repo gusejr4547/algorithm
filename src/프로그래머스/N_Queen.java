@@ -6,63 +6,43 @@ public class N_Queen {
     }
 
     int answer;
+    boolean[] col;
+    boolean[] a, b;
 
     public int solution(int n) {
         answer = 0;
-        boolean[][] board = new boolean[n][n];
-        for (int i = 0; i < n; i++) {
-            board[0][i] = true;
-            dfs(1, n, board);
-            board[0][i] = false;
-        }
+        col = new boolean[n];
+        a = new boolean[2 * n - 1];
+        b = new boolean[2 * n - 1];
+
+        dfs(0, n);
 
         return answer;
     }
 
-    private void dfs(int count, int n, boolean[][] board) {
-        if (count == n) {
+    private void dfs(int row, int n) {
+        if (row == n) {
             answer++;
             return;
         }
 
         for (int i = 0; i < n; i++) {
-            // 위치에 놓기 가능?
-            if (check(count, i, n, board)) {
-                board[count][i] = true;
-                dfs(count + 1, n, board);
-                board[count][i] = false;
-            }
-        }
-    }
+            int x = row + i;
+            int y = row - i + n - 1;
 
-    private boolean check(int r, int c, int n, boolean[][] board) {
-        int y = r;
-        int x = c;
-        // 대각 1
-        while (--y >= 0 && --x >= 0) {
-            if (board[y][x]) {
-                return false;
+            if (col[i] || a[x] || b[y]) {
+                continue;
             }
-        }
 
-        // 대각 2
-        y = r;
-        x = c;
-        while (--y >= 0 && ++x < n) {
-            if (board[y][x]) {
-                return false;
-            }
-        }
+            col[i] = true;
+            a[x] = true;
+            b[y] = true;
 
-        // 세로
-        y = r;
-        x = c;
-        while (--y >= 0) {
-            if (board[y][x]) {
-                return false;
-            }
-        }
+            dfs(row + 1, n);
 
-        return true;
+            col[i] = false;
+            a[x] = false;
+            b[y] = false;
+        }
     }
 }
