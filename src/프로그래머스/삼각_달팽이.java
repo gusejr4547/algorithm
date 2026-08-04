@@ -23,51 +23,45 @@ public class 삼각_달팽이 {
         */
 
         int[][] grid = new int[n][n];
-        // 아래쪽 -> 오른쪽 -> 좌상 대각 LOOP
+
         int[][] d = {
-                {1, 0},
-                {0, 1},
-                {-1, -1}
+                {1, 0},    // 아래
+                {0, 1},    // 오른쪽
+                {-1, -1}   // 왼쪽 위
         };
 
-        int dir = 0;
+        int max = n * (n + 1) / 2;
+
         int r = 0;
         int c = 0;
-        int id = 1;
+        int dir = 0;
 
-        while (true) {
+        for (int id = 1; id <= max; id++) {
             grid[r][c] = id;
 
             int nr = r + d[dir][0];
             int nc = c + d[dir][1];
-            if (nr < 0 || nc < 0 || nr >= n || nc >= n || grid[nr][nc] != 0) {
-                // 방향 변경 필요
-                dir = (dir + 1) % 3;
 
-                // 변경한 방향도 확인
+            if (nr < 0 || nc < 0 || nr >= n || nc >= n
+                    || grid[nr][nc] != 0) {
+                dir = (dir + 1) % 3;
                 nr = r + d[dir][0];
                 nc = c + d[dir][1];
-                if (nr < 0 || nc < 0 || nr >= n || nc >= n || grid[nr][nc] != 0) {
-                    break;
-                }
-                r = nr;
-                c = nc;
-            } else {
-                r = nr;
-                c = nc;
             }
 
-            id++;
+            r = nr;
+            c = nc;
         }
 
-        // answer 에 기록
-        List<Integer> answer = new ArrayList<>();
+        int[] answer = new int[max];
+        int index = 0;
+
         for (int i = 0; i < n; i++) {
             for (int j = 0; j <= i; j++) {
-                answer.add(grid[i][j]);
+                answer[index++] = grid[i][j];
             }
         }
 
-        return answer.stream().mapToInt(Integer::intValue).toArray();
+        return answer;
     }
 }
