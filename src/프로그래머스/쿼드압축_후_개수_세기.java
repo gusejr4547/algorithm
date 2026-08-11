@@ -22,24 +22,20 @@ public class 쿼드압축_후_개수_세기 {
     }
 
     private void dfs(int r, int c, int size) {
-        int cnt = 0;
-        for (int i = r; i < r + size; i++) {
+        int value = arr[r][c];
+        boolean same = true;
+
+        for (int i = r; i < r + size && same; i++) {
             for (int j = c; j < c + size; j++) {
-                if (arr[i][j] == 1) {
-                    cnt++;
+                if (arr[i][j] != value) {
+                    same = false;
+                    break;
                 }
             }
         }
 
-        int total = size * size;
-
-        // 같음.
-        if (cnt == total || cnt == 0) {
-            if (cnt > 0) {
-                answer[1]++;
-            } else {
-                answer[0]++;
-            }
+        if (same) {
+            answer[value]++;
             return;
         }
         // 다름 => dfs
