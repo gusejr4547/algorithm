@@ -3,6 +3,7 @@ package 코드트리.ACPC2026;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
@@ -36,40 +37,60 @@ public class 로봇의_이동 {
     }
 
     private static int bfs() {
-        boolean[][][] visit = new boolean[N + 1][N + 1][4]; // 바라보는 방향도 기록
-        PriorityQueue<State> queue = new PriorityQueue<>((o1, o2)->Integer.compare(o1.count, o2.count));
-        for (int d = 0; d < 4; d++) {
-            queue.offer(new State(2, 2, d, 0));
-            visit[2][2][d] = true;
+        int INF = Integer.MAX_VALUE;
+        int[][][] dist = new int[N + 1][N + 1][4];
+        for (int i = 0; i <= N; i++) {
+            for (int j = 0; j <= N; j++) {
+                Arrays.fill(dist[i][j], INF);
+            }
         }
 
+        ArrayDeque<State> queue = new ArrayDeque<>();
+        for (int d = 0; d < 4; d++) {
+            queue.offerLast(new State(2, 2, d, 0));
+            dist[2][2][d] = 0;
+        }
+
+        // 가중치가 달라서 dist 씀
         while (!queue.isEmpty()) {
-            State cur = queue.poll();
-            // N-1, N-1 도달
-            if (cur.y == N - 1 && cur.x == N - 1) {
-                return cur.count;
+            State cur = queue.pollFirst();
+
+            if (dist[cur.y][cur.x][cur.dir] < cur.count) {
+                continue;
             }
 
             // 전진
             int ny = cur.y + dy[cur.dir];
             int nx = cur.x + dx[cur.dir];
-            if (0 < ny && ny <= N && 0 < nx && nx <= N && !visit[ny][nx][cur.dir] && grid[ny][nx] == 0) {
-                queue.offer(new State(ny, nx, cur.dir, cur.count + 1));
-                visit[ny][nx][cur.dir] = true;
+
+            // 범위 검사
+            if (ny < 1 || ny > N || nx < 1 || nx > N) {
+                continue;
             }
 
-            // 벽을 만난 경우 전진 불가능 -> 방향 전환
-            if (grid[ny][nx] == 1) {
-                // y, x 좌표에서 dir을 추가
+            if (grid[ny][nx] == 0) {
+                if (dist[ny][nx][cur.dir] > cur.count + 1) {
+                    queue.offerLast(new State(ny, nx, cur.dir, cur.count + 1));
+                    dist[ny][nx][cur.dir] = cur.count + 1;
+                }
+            } else {
+                // 벽을 만난 경우 전진 불가능 -> 방향 전환
                 for (int d = 0; d < 4; d++) {
-                    if (!visit[cur.y][cur.x][d]) {
-                        queue.offer(new State(cur.y, cur.x, d, cur.count));
-                        visit[cur.y][cur.x][d] = true;
+                    if (dist[cur.y][cur.x][d] > cur.count) {
+                        queue.offerFirst(new State(cur.y, cur.x, d, cur.count));
+                        dist[cur.y][cur.x][d] = cur.count;
                     }
                 }
             }
         }
-        return -1;
+
+        int answer = INF;
+
+        for (int d = 0; d < 4; d++) {
+            answer = Math.min(answer, dist[N-1][N-1][d]);
+        }
+
+        return answer == INF ? -1 : answer;
     }
 
     private static class State {
