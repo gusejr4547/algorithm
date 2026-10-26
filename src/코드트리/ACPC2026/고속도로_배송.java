@@ -90,11 +90,6 @@ public class 고속도로_배송 {
 //            System.out.println(Arrays.toString(d));
 //        }
 
-        long answer = INF;
-        for (int i = 0; i <= N; i++) {
-            answer = Math.min(answer, dp[2 * N][i]);
-        }
-
-        System.out.println(answer);
+        System.out.println(dp[2 * N][0]);
     }
 }
