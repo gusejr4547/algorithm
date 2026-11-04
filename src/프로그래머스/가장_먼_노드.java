@@ -1,9 +1,6 @@
 package 프로그래머스;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class 가장_먼_노드 {
     public static void main(String[] args) {
@@ -14,28 +11,52 @@ public class 가장_먼_노드 {
     }
 
     public int solution(int n, int[][] edge) {
+        int answer = 0;
+
         List<Integer>[] adj = new List[n + 1];
-        for (int i = 0; i <= n; i++) {
+        for (int i = 1; i <= n; i++) {
             adj[i] = new ArrayList<>();
         }
-        for (int[] e : edge) {
-            int a = e[0];
-            int b = e[1];
-            adj[a].add(b);
-            adj[b].add(a);
-        }
-        int[] distance = dijkstra(n, adj);
 
-        int maxDistance = 0;
-        for (int i = 1; i <= n; i++) {
-            if (distance[i] != Integer.MAX_VALUE) {
-                maxDistance = Math.max(distance[i], maxDistance);
+        // 간선의 정보가 주어진다. 노드 사이의 거리는 1이라고 가정하겠다.
+        // 연결리스트 만들기
+        for (int[] e : edge) {
+            adj[e[0]].add(e[1]);
+            adj[e[1]].add(e[0]);
+        }
+
+        int[] dist = new int[n + 1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+
+        ArrayDeque<Integer> queue = new ArrayDeque<>();
+        queue.offer(1);
+        dist[1] = 0;
+
+        while (!queue.isEmpty()) {
+            int cur = queue.poll();
+
+            for (int next : adj[cur]) {
+                // 이미 방문
+                if (dist[next] != Integer.MAX_VALUE) {
+                    continue;
+                }
+
+                dist[next] = dist[cur] + 1;
+                queue.offer(next);
             }
         }
 
-        int answer = 0;
+        // dist 순회
+        int maxD = 0;
         for (int i = 1; i <= n; i++) {
-            if (distance[i] == maxDistance) {
+            if (dist[i] == Integer.MAX_VALUE) {
+                continue;
+            }
+            maxD = Math.max(maxD, dist[i]);
+        }
+
+        for(int i=1; i<=n; i++){
+            if(dist[i] == maxD){
                 answer++;
             }
         }
@@ -43,37 +64,67 @@ public class 가장_먼_노드 {
         return answer;
     }
 
-    public int[] dijkstra(int n, List<Integer>[] adj) {
-        PriorityQueue<Node> pq = new PriorityQueue<>((e1, e2) -> e1.cost - e2.cost);
-        int[] distance = new int[n + 1];
-        Arrays.fill(distance, Integer.MAX_VALUE);
-        distance[1] = 0;
-        boolean[] visit = new boolean[n + 1];
-        pq.offer(new Node(1, 0));
-
-        while (!pq.isEmpty()) {
-            Node curr = pq.poll();
-
-            if (visit[curr.num]) continue;
-            visit[curr.num] = true;
-
-            for (int next : adj[curr.num]) {
-                if (!visit[next] && distance[next] > curr.cost + 1) {
-                    distance[next] = curr.cost + 1;
-                    pq.offer(new Node(next, distance[next]));
-                }
-            }
-        }
-        return distance;
-    }
-
-    public class Node {
-        int num;
-        int cost;
-
-        public Node(int num, int cost) {
-            this.num = num;
-            this.cost = cost;
-        }
-    }
+//    public int solution(int n, int[][] edge) {
+//        List<Integer>[] adj = new List[n + 1];
+//        for (int i = 0; i <= n; i++) {
+//            adj[i] = new ArrayList<>();
+//        }
+//        for (int[] e : edge) {
+//            int a = e[0];
+//            int b = e[1];
+//            adj[a].add(b);
+//            adj[b].add(a);
+//        }
+//        int[] distance = dijkstra(n, adj);
+//
+//        int maxDistance = 0;
+//        for (int i = 1; i <= n; i++) {
+//            if (distance[i] != Integer.MAX_VALUE) {
+//                maxDistance = Math.max(distance[i], maxDistance);
+//            }
+//        }
+//
+//        int answer = 0;
+//        for (int i = 1; i <= n; i++) {
+//            if (distance[i] == maxDistance) {
+//                answer++;
+//            }
+//        }
+//
+//        return answer;
+//    }
+//
+//    public int[] dijkstra(int n, List<Integer>[] adj) {
+//        PriorityQueue<Node> pq = new PriorityQueue<>((e1, e2) -> e1.cost - e2.cost);
+//        int[] distance = new int[n + 1];
+//        Arrays.fill(distance, Integer.MAX_VALUE);
+//        distance[1] = 0;
+//        boolean[] visit = new boolean[n + 1];
+//        pq.offer(new Node(1, 0));
+//
+//        while (!pq.isEmpty()) {
+//            Node curr = pq.poll();
+//
+//            if (visit[curr.num]) continue;
+//            visit[curr.num] = true;
+//
+//            for (int next : adj[curr.num]) {
+//                if (!visit[next] && distance[next] > curr.cost + 1) {
+//                    distance[next] = curr.cost + 1;
+//                    pq.offer(new Node(next, distance[next]));
+//                }
+//            }
+//        }
+//        return distance;
+//    }
+//
+//    public class Node {
+//        int num;
+//        int cost;
+//
+//        public Node(int num, int cost) {
+//            this.num = num;
+//            this.cost = cost;
+//        }
+//    }
 }
